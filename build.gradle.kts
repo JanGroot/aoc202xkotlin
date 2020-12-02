@@ -13,6 +13,6 @@ dependencies {
     implementation("com.github.shiguruikai:combinatoricskt:1.6.0")
     testImplementation(kotlin("test-junit5"))
 }
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }

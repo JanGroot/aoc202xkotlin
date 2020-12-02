@@ -1,4 +1,4 @@
-fun read() = {}.javaClass.getResource("input1.txt").readText().lines().map {
+fun read() = readLines("input1.txt").map {
     it.toInt()
 }
 

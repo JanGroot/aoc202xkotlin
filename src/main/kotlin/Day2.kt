@@ -1,36 +1,27 @@
-fun readLines() = {}.javaClass.getResource("input2.txt").readText().lines();
+data class Input(val under: Int, val upper: Int, val letter: Char, val password: String)
 
 fun main() {
-    val input = readLines()
+    val input = readLines("input2.txt").map {
+        val match = """(\d+)-(\d+) (\w): (\w+)""".toRegex().find(it)
+        val (under, upper, letter, password) = match!!.destructured
+        Input(under.toInt(), upper.toInt(), letter[0], password)
+    }
     println(part1(input))
     println(part2(input))
 }
 
-fun part1(input: List<String>): Int {
-    return input.count { checkPass(it) }
+fun part1(input: List<Input>): Int = input.count { checkPass(it) }
+
+fun part2(input: List<Input>): Int = input.count { checkPass2(it) }
+
+fun checkPass(input: Input): Boolean {
+    val count = input.password.count { it == input.letter }
+    return count in input.under..input.upper
 }
 
-fun part2(input: List<String>): Int {
-    return input.count { checkPass2(it) }
-}
-
-fun checkPass(raw: String): Boolean {
-    val rule = raw.split(":")[0]
-    val password = raw.split(":")[1]
-    val range = rule.split(" ")[0]
-    val letter = rule.split(" ")[1].toCharArray()[0]
-    val count = password.count { it == letter }
-    val under = Integer.valueOf(range.split("-")[0])
-    val upper = Integer.valueOf(range.split("-")[1])
-    return count in under..upper
-}
-
-fun checkPass2(raw: String): Boolean {
-    val rule = raw.split(":")[0]
-    val password = raw.split(":")[1].trim()
-    val range = rule.split(" ")[0]
-    val letter = rule.split(" ")[1].toCharArray()[0]
-    val under = Integer.valueOf(range.split("-")[0]) - 1
-    val upper = Integer.valueOf(range.split("-")[1]) - 1
-    return (password[under] == letter || password[upper] == letter) && !(password[under] == letter && password[upper] == letter)
+fun checkPass2(input: Input): Boolean {
+    var count = 0
+    if (input.password[input.under - 1] == input.letter) count++
+    if (input.password[input.upper - 1] == input.letter) count++
+    return count == 1
 }
