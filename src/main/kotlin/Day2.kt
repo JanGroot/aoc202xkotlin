@@ -1,4 +1,7 @@
-data class Input(val under: Int, val upper: Int, val letter: Char, val password: String)
+data class Input(val under: Int, val upper: Int, val letter: Char, val password: String) {
+    fun passes() = password.count { it == letter } in under..upper
+    fun passes2() = listOf(upper, under).count {password[it -1] == letter} == 1
+}
 
 fun main() {
     val input = readLines("input2.txt").map {
@@ -10,18 +13,6 @@ fun main() {
     println(part2(input))
 }
 
-fun part1(input: List<Input>): Int = input.count { checkPass(it) }
+fun part1(input: List<Input>): Int = input.count { it.passes() }
 
-fun part2(input: List<Input>): Int = input.count { checkPass2(it) }
-
-fun checkPass(input: Input): Boolean {
-    val count = input.password.count { it == input.letter }
-    return count in input.under..input.upper
-}
-
-fun checkPass2(input: Input): Boolean {
-    var count = 0
-    if (input.password[input.under - 1] == input.letter) count++
-    if (input.password[input.upper - 1] == input.letter) count++
-    return count == 1
-}
+fun part2(input: List<Input>): Int = input.count { it.passes2() }
