@@ -15,10 +15,10 @@ fun part2(input: List<String>): Int {
 }
 
 fun checkPass(raw: String): Boolean {
-    var rule = raw.split(":")[0]
-    var password = raw.split(":")[1]
-    var range = rule.split(" ")[0]
-    var letter = rule.split(" ")[1].toCharArray()[0]
+    val rule = raw.split(":")[0]
+    val password = raw.split(":")[1]
+    val range = rule.split(" ")[0]
+    val letter = rule.split(" ")[1].toCharArray()[0]
     val count = password.count { it == letter }
     val under = Integer.valueOf(range.split("-")[0])
     val upper = Integer.valueOf(range.split("-")[1])
@@ -26,10 +26,10 @@ fun checkPass(raw: String): Boolean {
 }
 
 fun checkPass2(raw: String): Boolean {
-    var rule = raw.split(":")[0]
-    var password = raw.split(":")[1].trim()
-    var range = rule.split(" ")[0]
-    var letter = rule.split(" ")[1].toCharArray()[0]
+    val rule = raw.split(":")[0]
+    val password = raw.split(":")[1].trim()
+    val range = rule.split(" ")[0]
+    val letter = rule.split(" ")[1].toCharArray()[0]
     val under = Integer.valueOf(range.split("-")[0]) - 1
     val upper = Integer.valueOf(range.split("-")[1]) - 1
     return (password[under] == letter || password[upper] == letter) && !(password[under] == letter && password[upper] == letter)
