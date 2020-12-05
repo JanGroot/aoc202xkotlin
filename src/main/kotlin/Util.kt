@@ -1,1 +1,0 @@
-fun readLines(file: String) = {}.javaClass.getResource(file).readText().lines()
