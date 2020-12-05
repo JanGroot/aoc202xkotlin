@@ -1,11 +1,10 @@
 fun main() {
-    val records = {}.javaClass.getResource("input5.txt").readText().lines().toInt().sorted()
+    val records = {}.javaClass.getResource("input5.txt").readText().lines().map { it.toBinary("BR").toInt(2) }.sorted()
     println(records.last())
     println((records.first()..records.last()).first { it !in records })
 }
 
-fun List<String>.toInt() =
-    map { it.replace('B', '1').replace('R', '1').replace('F', '0').replace('L', '0').toInt(2) }
+fun String.toBinary(ones: String) = map { c -> if (c in ones) '1' else '0' }.joinToString("")
 
 
 
