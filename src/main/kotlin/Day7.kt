@@ -9,13 +9,14 @@ fun main() {
         }.toList()
         colour to bags
     }.toMap()
-    getParentBags(bagsByColour, "shiny gold").toSet().also { println(it.size - 1) }
-    getChildBags(bagsByColour, "shiny gold").also { println(it - 1) }
 
+    fun getParentBags(colour: String): List<String> =
+        bagsByColour.filter { it.value.any { bag -> bag.colour == colour } }
+            .flatMap { (key, _) -> getParentBags(key) } + colour
+
+    fun getChildBags(colour: String): Int =
+        1 + (bagsByColour[colour]?.map { it.quantity * getChildBags(it.colour) }?.sum() ?: 1)
+
+    getParentBags("shiny gold").toSet().also { println(it.size - 1) }
+    getChildBags("shiny gold").also { println(it - 1) }
 }
-fun getParentBags(bags: Map<String, List<Bag>>, colour: String): List<String> =
-    bags.filter { it.value.any { bag -> bag.colour == colour } }
-        .flatMap { (key, _) -> getParentBags(bags, key) } + colour
-
-fun getChildBags(bags: Map<String, List<Bag>>, colour: String): Int =
-     1 + (bags[colour]?.map { it.quantity * getChildBags(bags, it.colour) }?.sum() ?: 1)
