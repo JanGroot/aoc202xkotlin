@@ -2,12 +2,12 @@ data class Bag(val colour: String, val quantity: Int)
 
 fun main() {
     val bagsByColour = {}.javaClass.getResource("input7.txt").readText().lines().map {
-        val colour = it.substringBefore(" bag")
+        val key = it.substringBefore(" bag")
         val bags = """(\d+) (\w+ \w+)\b""".toRegex().findAll(it).map { match ->
-            val (quantity, colour) = match!!.destructured
+            val (quantity, colour) = match.destructured
             Bag(colour, quantity.toInt())
         }.toList()
-        colour to bags
+        key to bags
     }.toMap()
 
     fun getParentBags(colour: String): List<String> =
