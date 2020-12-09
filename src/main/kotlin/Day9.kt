@@ -1,34 +1,24 @@
 fun main() {
-    var input = readInput()
-    var key = 0L
-    for (i in 25 until input.size) {
-        val numbers = input.subList(i - 25, i)
-        if (hasNoSum(numbers, input[i])) key = input[i]
-    }
+    val input = {}.javaClass.getResource("input9.txt").readText().lines().map { it.toLong() }
+    val key = input.findElementWhichHasNoSumInPreamble(25)
     println("$key")
-    findRange(input, key).also {
-        println("${it.sum()} ")
+    println("${input.findRangeThatSumsTo(key).sumOfMinAndMax()}")
+}
+
+fun List<Long>.findElementWhichHasNoSumInPreamble(preamble: Int): Long {
+    for (i in preamble until size) if (this.subList(i - preamble, i).hasNoPairThatSumsTo(this[i])) return this[i]
+    error("not found")
+}
+
+fun List<Long>.hasNoPairThatSumsTo(number: Long) = find { (number - it) in this && it != number } == null
+
+fun List<Long>.findRangeThatSumsTo(number: Long): List<Long> {
+    for (i in indices) for (j in indices.reversed()) {
+        if (j < i) break
+        val sub = subList(i, j)
+        if (sub.sum() == number) return sub
     }
-
+    error("not found")
 }
 
-fun hasNoSum(numbers: List<Long>, number: Long): Boolean {
-    return numbers.find {
-            i -> (number - i) in numbers
-            && i != number } == null
-}
-
-fun findRange(numbers: List<Long>, number: Long): List<Long> {
-    for (i in numbers.indices) {
-        for (j in numbers.indices.reversed()) {
-            if (j < i ) break
-            var sub = numbers.subList(i, j)
-            if (sub.sum() == number) return listOf(sub.minOrNull()!!, sub.maxOrNull()!!)
-        }
-    }
-    return emptyList()
-}
-
-private fun readInput() =
-    {}.javaClass.getResource("input9.txt").readText().lines().map{it.toLong()}
-
+fun List<Long>.sumOfMinAndMax() = minOrNull()!! + maxOrNull()!!
