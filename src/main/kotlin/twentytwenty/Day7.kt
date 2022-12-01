@@ -1,7 +1,9 @@
+package twentytwenty
+
 data class Bag(val colour: String, val quantity: Int)
 
 fun main() {
-    val bagsByColour = {}.javaClass.getResource("input7.txt").readText().lines().map {
+    val bagsByColour = {}.javaClass.getResource("twentytwenty/input7.txt").readText().lines().map {
         val key = it.substringBefore(" bag")
         val bags = """(\d+) (\w+ \w+)\b""".toRegex().findAll(it).map { match ->
             val (quantity, colour) = match.destructured

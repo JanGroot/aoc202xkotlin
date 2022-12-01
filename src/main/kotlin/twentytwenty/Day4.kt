@@ -1,5 +1,5 @@
 fun main() {
-    val records = {}.javaClass.getResource("input4.txt").readText().split("\n\n")
+    val records = {}.javaClass.getResource("twentytwenty/input4.txt").readText().split("\n\n")
     val allPassports = records.map { record ->
         record.split("\\s".toRegex()).map {
             val (key, value) = it.split(":")

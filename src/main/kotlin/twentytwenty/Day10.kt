@@ -1,6 +1,6 @@
 
 fun main() {
-    val input = {}.javaClass.getResource("input10.txt").readText().lines().map { it.toInt() }.sorted()
+    val input = {}.javaClass.getResource("twentytwenty/input10.txt").readText().lines().map { it.toInt() }.sorted()
     val counts = mutableMapOf<Int, Int>();
     input.reduce { a, b ->
         var c = counts.getOrDefault(b - a, 1)

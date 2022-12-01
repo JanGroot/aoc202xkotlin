@@ -1,5 +1,5 @@
 fun main() {
-    val seatNumbers = {}.javaClass.getResource("input5.txt").readText().lines().map { it.toBinary("BR").toInt(2) }.sorted()
+    val seatNumbers = {}.javaClass.getResource("twentytwenty/input5.txt").readText().lines().map { it.toBinary("BR").toInt(2) }.sorted()
     println(seatNumbers.last())
     println((seatNumbers.first()..seatNumbers.last()).first { it !in seatNumbers })
 }

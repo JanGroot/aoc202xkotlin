@@ -14,7 +14,7 @@ fun main() {
 }
 
 private fun readInput() =
-    {}.javaClass.getResource("input8.txt").readText().lines()
+    {}.javaClass.getResource("/twentytwenty/input8.txt").readText().lines()
         .map { Instruction(it.split(" ")[0], it.split(" ")[1].toInt()) }
 
 fun List<Instruction>.run(index: Int = -1): Pair<Int, Boolean> {

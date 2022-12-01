@@ -1,5 +1,5 @@
 fun main() {
-    val input = {}.javaClass.getResource("input9.txt").readText().lines().map { it.toLong() }
+    val input = {}.javaClass.getResource("twentytwenty/input9.txt").readText().lines().map { it.toLong() }
     val key = input.findElementWhichHasNoSumInPreamble(25)
     println(key)
     println(input.findRangeThatSumsTo(key).sumOfMinAndMax())

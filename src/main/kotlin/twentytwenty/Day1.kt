@@ -1,3 +1,4 @@
+package twentytwenty
 fun main() {
     val numbers = {}.javaClass.getResource("input1.txt").readText().lines().map { it.toInt() }
     println(productOfTwoEntriesSummingTo2020(numbers))
