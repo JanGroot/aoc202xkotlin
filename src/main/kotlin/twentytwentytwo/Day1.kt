@@ -1,40 +1,15 @@
 package twentytwentytwo
 
 fun main() {
-    val input = {}.javaClass.getResource("input-1.txt")?.readText()!!.lines()
+    val input = {}.javaClass.getResource("input-1.txt")!!.readText().split("\n\n");
     println(dayOnePartOne(input))
     println(dayOnePartTwo(input))
 }
 
 fun dayOnePartOne(input: List<String>): Int {
-    input.spliterator()
-    var max = 0
-    var total = 0
-    for (line in input) {
-        if (line != "")
-            total += Integer.parseInt(line)
-        else {
-            if (total > max) {
-                max = total
-            }
-
-            total = 0
-        }
-    }
-    return max
+    return input.map { s -> s.lines().filter { x -> x != "" } }.map { l -> l.map { s -> s.toInt() }.sum() }.max();
 }
 
 fun dayOnePartTwo(input: List<String>): Int {
-
-    var totals = ArrayList<Int>()
-    var total = 0
-    for (line in input) {
-        if (line != "") {
-            total += Integer.parseInt(line)
-        } else {
-            totals.add(total)
-            total = 0
-        }
-    }
-    return totals.sortedDescending().take(3).sum()
+    return input.asSequence().map { s -> s.lines().filter { x -> x != "" } }.map { l -> l.map { s -> s.toInt() }.sum() }.sortedDescending().take(3).sum()
 }
