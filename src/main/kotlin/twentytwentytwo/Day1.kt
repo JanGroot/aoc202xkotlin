@@ -7,9 +7,17 @@ fun main() {
 }
 
 fun dayOnePartOne(input: List<String>): Int {
-    return input.map { s -> s.lines().filter { x -> x != "" } }.map { l -> l.map { s -> s.toInt() }.sum() }.max();
+    return input
+        .map { s -> s.lines().filter { it.isNotEmpty() } }
+        .maxOf { l -> l.sumOf { s -> s.toInt() } }
 }
 
 fun dayOnePartTwo(input: List<String>): Int {
-    return input.asSequence().map { s -> s.lines().filter { x -> x != "" } }.map { l -> l.map { s -> s.toInt() }.sum() }.sortedDescending().take(3).sum()
+    return input
+        .asSequence()
+        .map { s -> s.lines().filter { it.isNotEmpty() } }
+        .map { l -> l.sumOf { s -> s.toInt() } }
+        .sortedDescending()
+        .take(3)
+        .sum()
 }
