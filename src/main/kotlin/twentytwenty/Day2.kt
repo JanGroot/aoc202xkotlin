@@ -6,7 +6,7 @@ data class Password(val under: Int, val upper: Int, val letter: Char, val passwo
 }
 
 fun main() {
-    val passwords = {}.javaClass.getResource("twentytwenty/input2.txt").readText().lines().map {
+   val passwords = {}.javaClass.getResource("input2.txt").readText().lines().map {
         val match = """(\d+)-(\d+) (\w): (\w+)""".toRegex().find(it)
         val (under, upper, letter, password) = match!!.destructured
         Password(under.toInt(), upper.toInt(), letter[0], password)
