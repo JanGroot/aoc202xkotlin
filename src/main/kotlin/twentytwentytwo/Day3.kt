@@ -11,10 +11,8 @@ class Day3(private val input: List<String>) {
     private val charIntMap = (('a'..'z') + ('A'..'Z')).withIndex().associate { it.value to it.index + 1 }
     fun part1(): Int {
         return input.sumOf {
-            val compartmentA = it.substring(0, it.midpoint() + 1)
-            val compartmentB = it.substring(it.midpoint() + 1, it.length)
-            val intersect = compartmentA.toSet().intersect(compartmentB.toSet())
-            charIntMap[intersect.first()]!!
+            val compartments = it.divide()
+            charIntMap[compartments.first.toSet().intersect(compartments.second.toSet()).first()]!!
         }
     }
 
@@ -24,6 +22,7 @@ class Day3(private val input: List<String>) {
         }
     }
 
-    private fun String.midpoint(): Int =
-        lastIndex / 2
+    private fun String.divide() =
+        Pair(this.substring(0, (lastIndex / 2) +1), this.substring((lastIndex /2) + 1, this.length))
+
 }
