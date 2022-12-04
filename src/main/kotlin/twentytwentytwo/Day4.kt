@@ -22,7 +22,7 @@ class Day4(private val input: List<List<IntRange>>) {
     fun part2(): Int {
         return input
             .count {
-                it.first().any { n -> it.last().contains(n) } || it.last().any { n -> it.first().contains(n) }
+                it.first().any { n -> it.last().contains(n) }
             }
     }
 }
