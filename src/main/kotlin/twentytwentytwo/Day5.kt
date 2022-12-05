@@ -12,8 +12,8 @@ class Day5(private val crates: String, private val moves: String) {
     fun part1(): String {
         val stacks = getStacks()
         getMoves().forEach {
-            val (number, from, to) = it
-            for (i in 1..number) {
+            (number, from, to)  ->
+            repeat(number) {
                 stacks[to]!!.add(stacks[from]!!.removeLast())
             }
         }
@@ -22,11 +22,9 @@ class Day5(private val crates: String, private val moves: String) {
 
     fun part2(): String {
         val stacks = getStacks()
-        getMoves().forEach {
-            val (number, from, to) = it
-            val first = stacks[from]!!.take(stacks[from]!!.size - number)
-            val second = stacks[from]!!.takeLast(number)
-            stacks[from] = first.toMutableList()
+        getMoves().forEach { (number, from, to) ->
+            val (first, second) = stacks[from]!!.split(number)
+            stacks[from] = first
             stacks[to]!!.addAll(second)
         }
         return stacks.values.map { it.last() }.reduce { code, s -> code + s }
@@ -37,25 +35,28 @@ class Day5(private val crates: String, private val moves: String) {
             .filter { it.contains("[") }
             .map { s ->
                 s.windowed(4, 4, true)
-                    .map { s -> s.trim() }
+                    .map { s -> s.filter { it.isUpperCase() } }
                     .mapIndexed { index, value -> index + 1 to value }
                     .filter { it.second.isNotEmpty() }
             }.flatten()
-            .groupByTo(HashMap(), keySelector = { p -> p.first }, valueTransform = { p -> p.second[1].toString() })
+            .groupByTo(HashMap(), keySelector = { p -> p.first }, valueTransform = { p -> p.second })
         stackedMap.values.forEach { it.reverse() }
         return stackedMap
     }
 
     private fun getMoves(): List<List<Int>> {
-        val numRegex = "\\d+".toRegex()
-        return moves.split("\n")
+        return moves.split("\n").filter { it.isNotEmpty() }
             .map { s ->
-                numRegex
-                    .findAll(s)
-                    .map { r -> r.value.trim().toInt() }
-                    .toList()
+                s.split(" ").filter { s1 -> s1.any { it.isDigit() } }
+                    .filter { it.isNotEmpty() }.map { it.toInt() }
             }
-            .filter { it.isNotEmpty() }
+
     }
+    private fun MutableList<String>.split(number: Int): Pair<MutableList<String>, MutableList<String>> {
+        return Pair(take(size - number).toMutableList(), takeLast(number).toMutableList())
+    }
+
 }
+
+
 
