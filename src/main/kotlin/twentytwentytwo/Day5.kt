@@ -1,7 +1,5 @@
 package twentytwentytwo
 
-import java.util.HashMap
-
 fun main() {
     val (crates, moves) = {}.javaClass.getResource("input-5.txt")!!.readText().split("\n\n")
     val day = Day5(crates, moves)
@@ -13,8 +11,7 @@ class Day5(private val crates: String, private val moves: String) {
 
     fun part1(): String {
         val stacks = getStacks()
-        getMoves().forEach {
-            (number, from, to)  ->
+        getMoves().forEach { (number, from, to) ->
             repeat(number) {
                 stacks[to]!!.add(stacks[from]!!.removeLast())
             }
@@ -34,23 +31,23 @@ class Day5(private val crates: String, private val moves: String) {
 
     private fun getStacks(): MutableMap<Int, MutableList<String>> {
         val indexes = 1..33 step 4
-        val lines = crates.lines()
-            .filter { it.contains("[") }.reversed()
+        val lines = crates.linesFiltered{ it.contains("[") }.reversed()
         val listOfStacks = indexes.map { i -> lines.map { it[i] }.filter { it.isUpperCase() }.map { it.toString() } }
-        return listOfStacks.mapIndexed{ i, v -> i + 1 to v.toMutableList()}.toMap(HashMap())
+        return listOfStacks.mapIndexed { i, v -> i + 1 to v.toMutableList() }.toMap(HashMap())
     }
 
     /**
      * transforms "'move 8 from 3 to 2'\n 'move 8 from 3 to 2'" to [[8,3,2],[8,3,2]]
      */
     private fun getMoves(): List<List<Int>> {
-        return moves.split("\n").filter { it.isNotEmpty() }
+        return moves.linesFiltered { it.isNotEmpty() }
             .map { s ->
                 s.split(" ").filter { s1 -> s1.any { it.isDigit() } }
                     .filter { it.isNotEmpty() }.map { it.toInt() }
             }
 
     }
+
     private fun MutableList<String>.split(number: Int): Pair<MutableList<String>, MutableList<String>> {
         return Pair(take(size - number).toMutableList(), takeLast(number).toMutableList())
     }
