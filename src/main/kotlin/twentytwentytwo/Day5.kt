@@ -16,7 +16,7 @@ class Day5(private val crates: String, private val moves: String) {
                 stacks[to]!!.add(stacks[from]!!.removeLast())
             }
         }
-        return stacks.values.map { it.last() }.reduce { code, s -> code + s }
+        return stacks.values.joinToString("") { it.last() }
     }
 
     fun part2(): String {
@@ -26,12 +26,12 @@ class Day5(private val crates: String, private val moves: String) {
             stacks[from] = first
             stacks[to]!!.addAll(second)
         }
-        return stacks.values.map { it.last() }.reduce { code, s -> code + s }
+        return stacks.values.joinToString("") { it.last() }
     }
 
     private fun getStacks(): MutableMap<Int, MutableList<String>> {
         val indexes = 1..33 step 4
-        val lines = crates.linesFiltered{ it.contains("[") }.reversed()
+        val lines = crates.linesFiltered { it.contains("[") }.reversed()
         val listOfStacks = indexes.map { i -> lines.map { it[i] }.filter { it.isUpperCase() }.map { it.toString() } }
         return listOfStacks.mapIndexed { i, v -> i + 1 to v.toMutableList() }.toMap(HashMap())
     }
