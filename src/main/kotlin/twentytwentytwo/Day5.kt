@@ -1,5 +1,7 @@
 package twentytwentytwo
 
+import java.util.HashMap
+
 fun main() {
     val (crates, moves) = {}.javaClass.getResource("input-5.txt")!!.readText().split("\n\n")
     val day = Day5(crates, moves)
@@ -30,20 +32,17 @@ class Day5(private val crates: String, private val moves: String) {
         return stacks.values.map { it.last() }.reduce { code, s -> code + s }
     }
 
-    private fun getStacks(): HashMap<Int, MutableList<String>> {
-        val stackedMap = crates.lines()
-            .filter { it.contains("[") }
-            .map { s ->
-                s.windowed(4, 4, true)
-                    .map { s -> s.filter { it.isUpperCase() } }
-                    .mapIndexed { index, value -> index + 1 to value }
-                    .filter { it.second.isNotEmpty() }
-            }.flatten()
-            .groupByTo(HashMap(), keySelector = { p -> p.first }, valueTransform = { p -> p.second })
-        stackedMap.values.forEach { it.reverse() }
-        return stackedMap
+    private fun getStacks(): MutableMap<Int, MutableList<String>> {
+        val indexes = 1..33 step 4
+        val lines = crates.lines()
+            .filter { it.contains("[") }.reversed()
+        val listOfStacks = indexes.map { i -> lines.map { it[i] }.filter { it.isUpperCase() }.map { it.toString() } }
+        return listOfStacks.mapIndexed{ i, v -> i + 1 to v.toMutableList()}.toMap(HashMap())
     }
 
+    /**
+     * transforms "'move 8 from 3 to 2'\n 'move 8 from 3 to 2'" to [[8,3,2],[8,3,2]]
+     */
     private fun getMoves(): List<List<Int>> {
         return moves.split("\n").filter { it.isNotEmpty() }
             .map { s ->
