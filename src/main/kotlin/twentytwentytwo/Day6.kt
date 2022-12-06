@@ -9,15 +9,13 @@ fun main() {
 
 class Day6(private val input: String) {
     fun part1(): Int {
-        input.split("")
-        val found = input.split("").asSequence().filter { it.isNotEmpty() }.windowed(4).filter { it.toSet().size == 4 }.first().joinToString("")
-        return input.indexOf(found) + 4
+        return input.asSequence().windowed(4)
+            .indexOfFirst { it.toSet().size == 4 } + 4
     }
 
     fun part2(): Int {
-        input.split("")
-        val found = input.split("").asSequence().filter { it.isNotEmpty() }.windowed(14).filter { it.toSet().size == 14 }.first().joinToString("")
-        return input.indexOf(found) + 14
+        return input.asSequence().windowed(14)
+            .indexOfFirst { it.toSet().size == 14 } + 14
     }
 }
 
