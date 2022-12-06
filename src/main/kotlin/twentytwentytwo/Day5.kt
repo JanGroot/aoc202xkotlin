@@ -43,7 +43,7 @@ class Day5(private val crates: String, private val moves: String) {
         return moves.linesFiltered { it.isNotEmpty() }
             .map { s ->
                 s.split(" ").filter { s1 -> s1.any { it.isDigit() } }
-                    .filter { it.isNotEmpty() }.map { it.toInt() }
+                    .map { it.toInt() }
             }
 
     }
