@@ -1,13 +1,13 @@
 package twentytwentytwo
 
 fun main() {
-    val input = {}.javaClass.getResource("input-X.txt")!!.readText().linesFiltered { it.isNotEmpty() };
-    val day = DayX(input)
+    val input = {}.javaClass.getResource("input-8.txt")!!.readText().linesFiltered { it.isNotEmpty() };
+    val day = Day8(input)
     println(day.part1())
     println(day.part2())
 }
 
-class DayX(private val input: List<String>) {
+class Day8(private val input: List<String>) {
     fun part1(): Int {
         error("not found")
     }
