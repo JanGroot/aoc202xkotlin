@@ -13,7 +13,7 @@ fun main() {
 
 class Day8(input: List<String>) {
     private val trees = input.mapIndexed { y, row ->
-        row.mapIndexed { x, s -> Pair(Point2d(x, y), s.code) }
+        row.mapIndexed { x, s -> Tree(Point2d(x, y), s.code) }
     }.flatten()
 
     init {
@@ -23,7 +23,7 @@ class Day8(input: List<String>) {
         }
     }
 
-    fun part1() = trees.filter { it.visible() }.toSet().size
+    fun part1() = trees.filter { it.visible() }.size
 
     fun part2() = trees.maxOf { it.sees() }
 
@@ -32,27 +32,22 @@ class Day8(input: List<String>) {
         private val rows = mutableMapOf<Int, List<Tree>>()
         private val columns = mutableMapOf<Int, List<Tree>>()
 
-        private fun List<Tree>.split(number: Int) = listOf(take(number), takeLast(size - number - 1))
-
         fun Tree.sees(): Int {
-            val (left, right) = rows[first.y]!!.split(this.first.x)
-            val (above, under) = columns[first.x]!!.split(this.first.y)
+            val (left, right, above, under) = getLines()
             return countVisibleTrees(left.reversed()) * countVisibleTrees(right) * countVisibleTrees(under) * countVisibleTrees(
                 above.reversed()
             )
         }
 
-        private fun Tree.countVisibleTrees(trees: List<Tree>): Int =
+        fun Tree.visible() = edge() || getLines().any { isBiggest(it) }
+
         // check if we reached the end otherwise add 1. (should have a takeWhileInclusive or something)
-            // could also be max of both..
-            trees.takeWhile { it.second < second }.count()
-                .let { count -> if (count == trees.size) count else count + 1 }
+        private fun Tree.countVisibleTrees(trees: List<Tree>) = trees.takeWhile { it.second < second }.count()
+            .let { count -> if (count == trees.size) count else count + 1 }
 
+        private fun Tree.getLines() = rows[first.y]!!.split(this.first.x) + columns[first.x]!!.split(this.first.y)
 
-        fun Tree.visible(): Boolean {
-            val lines = rows[first.y]!!.split(this.first.x) + columns[first.x]!!.split(this.first.y)
-            return edge() || lines.any { isBiggest(it) }
-        }
+        private fun List<Tree>.split(number: Int) = listOf(take(number), takeLast(size - number - 1))
 
         private fun Tree.isBiggest(trees: List<Tree>) = trees.all { it.second < second }
 
