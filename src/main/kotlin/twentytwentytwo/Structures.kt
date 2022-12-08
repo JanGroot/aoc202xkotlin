@@ -1,5 +1,8 @@
 package twentytwentytwo
 
+import kotlin.math.absoluteValue
+import kotlin.math.sign
+
 typealias Visitor<T> = (Structures.TreeNode<T>) -> Unit
 
 class Structures {
@@ -60,5 +63,14 @@ class Structures {
             }
             return result
         }
+    }
+
+    data class Point2d(val x: Int, val y: Int) {
+
+        infix fun sameRow(that: Point2d): Boolean  =
+            y == that.y
+
+        infix fun sameColumn(that: Point2d): Boolean =
+            x == that.x
     }
 }
