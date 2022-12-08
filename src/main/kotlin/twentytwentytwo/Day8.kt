@@ -1,5 +1,8 @@
 package twentytwentytwo
 
+import twentytwentytwo.Structures.*
+
+typealias Tree = Pair<Point2d, Int>
 fun main() {
     val input = {}.javaClass.getResource("input-8.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val day = Day8(input)
@@ -11,7 +14,7 @@ class Day8(private val input: List<String>) {
 
     fun part1(): Int {
         val grid = input.mapIndexed { indexY, s ->
-            s.split("").filter { it.isNotEmpty() }.mapIndexed { indexX, s -> Pair(Structures.Point2d(indexX, indexY), s.toInt()) }
+            s.split("").filter { it.isNotEmpty() }.mapIndexed { indexX, s -> Pair(Point2d(indexX, indexY), s.toInt()) }
         }.flatten();
         val maxX = grid.maxOf { it.first.x }
         val maxY = grid.maxOf { it.first.y }
@@ -21,17 +24,17 @@ class Day8(private val input: List<String>) {
     fun part2(): Int {
         val grid = input.mapIndexed { indexY, s ->
             s.split("").filter { it.isNotEmpty() }
-                .mapIndexed { indexX, s -> Pair(Structures.Point2d(indexX, indexY), s.toInt()) }
+                .mapIndexed { indexX, s -> Tree(Point2d(indexX, indexY), s.toInt()) }
         }.flatten();
         return grid.maxOf { it.sees(grid) }
     }
 
-    private fun List<Pair<Structures.Point2d, Int>>.split(number: Int): Pair<List<Pair<Structures.Point2d, Int>>, List<Pair<Structures.Point2d, Int>>> {
+    private fun List<Tree>.split(number: Int): Pair<List<Tree>, List<Tree>> {
         return Pair(take(number), takeLast(size - number -1))
     }
 
 
-    fun Pair<Structures.Point2d, Int>.sees(grid: List<Pair<Structures.Point2d, Int>>): Int {
+    fun Tree.sees(grid: List<Tree>): Int {
         val row = grid.filter { this.first.sameRow(it.first) }
         val column = grid.filter { this.first.sameColumn(it.first) }
         val (left, right) = row.split(this.first.x)
@@ -44,7 +47,7 @@ class Day8(private val input: List<String>) {
             .count().let { count -> if (count == under.size) count else count + 1 }
     }
 
-    fun Pair<Structures.Point2d, Int>.visible(grid: List<Pair<Structures.Point2d, Int>>) : Boolean{
+    fun Pair<Point2d, Int>.visible(grid: List<Tree>) : Boolean{
         val row = grid.filter { this.first.sameRow(it.first) }
         val column = grid.filter { this.first.sameColumn(it.first) }
         val (left, right) = row.split(this.first.x)
@@ -52,8 +55,12 @@ class Day8(private val input: List<String>) {
         return left.all {it.second < second}  || right.all{it.second < second} || above.all{it.second < second} || under.all { it.second < second }
     }
 
-    fun Pair<Structures.Point2d, Int>.edge(maxX: Int, maxY: Int) : Boolean{
+    fun Tree.edge(maxX: Int, maxY: Int) : Boolean{
         return first.x == 0 || first.x == maxX || first.y == 0 || first.y == maxY
+    }
+
+    companion object {
+        val rows = mutableMapOf<Int, List<Tree>>()
     }
 }
 
