@@ -23,49 +23,40 @@ class Day8(input: List<String>) {
         }
     }
 
-    fun part1(): Int {
-        val maxX = trees.maxOf { it.first.x }
-        val maxY = trees.maxOf { it.first.y }
-        return trees.filter { it.edge(maxX, maxY) || it.visible() }.toSet().size
-    }
+    fun part1() = trees.filter { it.visible() }.toSet().size
 
-    fun part2(): Int = trees.maxOf { it.sees() }
+    fun part2() = trees.maxOf { it.sees() }
 
 
     companion object {
         private val rows = mutableMapOf<Int, List<Tree>>()
-
         private val columns = mutableMapOf<Int, List<Tree>>()
-        private fun List<Tree>.split(number: Int): Pair<List<Tree>, List<Tree>> {
-            return Pair(take(number), takeLast(size - number - 1))
-        }
+
+        private fun List<Tree>.split(number: Int) = listOf(take(number), takeLast(size - number - 1))
 
         fun Tree.sees(): Int {
-            val row = rows[first.y]
-            val column = columns[first.x]
-            val (left, right) = row!!.split(this.first.x)
-            val (above, under) = column!!.split(this.first.y)
-            return countVisibleTrees(left.reversed()) * countVisibleTrees(right) * countVisibleTrees(under) * countVisibleTrees(above.reversed())
+            val (left, right) = rows[first.y]!!.split(this.first.x)
+            val (above, under) = columns[first.x]!!.split(this.first.y)
+            return countVisibleTrees(left.reversed()) * countVisibleTrees(right) * countVisibleTrees(under) * countVisibleTrees(
+                above.reversed()
+            )
         }
 
         private fun Tree.countVisibleTrees(trees: List<Tree>): Int =
-            // check if we reached the end otherwise add 1. (should have a takeWhileInclusive or something)
+        // check if we reached the end otherwise add 1. (should have a takeWhileInclusive or something)
             // could also be max of both..
-            trees.takeWhile { it.second < second }
-                .count().let { count -> if (count == trees.size) count else count + 1 }
+            trees.takeWhile { it.second < second }.count()
+                .let { count -> if (count == trees.size) count else count + 1 }
 
 
         fun Tree.visible(): Boolean {
-            val row = rows[first.y]
-            val column = columns[first.x]
-            val (left, right) = row!!.split(this.first.x)
-            val (above, under) = column!!.split(this.first.y)
-            return left.all { it.second < second } || right.all { it.second < second } || above.all { it.second < second } || under.all { it.second < second }
+            val lines = rows[first.y]!!.split(this.first.x) + columns[first.x]!!.split(this.first.y)
+            return edge() || lines.any { isBiggest(it) }
         }
 
-        fun Tree.edge(maxX: Int, maxY: Int): Boolean {
-            return first.x == 0 || first.x == maxX || first.y == 0 || first.y == maxY
-        }
+        private fun Tree.isBiggest(trees: List<Tree>) = trees.all { it.second < second }
+
+        private fun Tree.edge() = first.x == 0 || first.x == columns.size || first.y == 0 || first.y == rows.size
     }
 }
 
