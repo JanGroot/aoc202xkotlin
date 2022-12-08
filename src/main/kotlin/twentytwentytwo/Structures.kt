@@ -1,8 +1,5 @@
 package twentytwentytwo
 
-import kotlin.math.absoluteValue
-import kotlin.math.sign
-
 typealias Visitor<T> = (Structures.TreeNode<T>) -> Unit
 
 class Structures {

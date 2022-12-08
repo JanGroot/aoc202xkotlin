@@ -1,19 +1,31 @@
 package twentytwentytwo
 
 import twentytwentytwo.Structures.Point2d
+import kotlin.math.sqrt
 
 typealias Tree = Pair<Point2d, Int>
 
 fun main() {
     val input = {}.javaClass.getResource("input-8.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val day = Day8(input)
+    val columns = (0 until input[0].length).map { index -> input.map { it[index].digitToInt() } }.also { println(it) }
+    val rows = (input.indices).map { index -> input[index].map { it.digitToInt() } }.also { println(it) }
+    val size = sqrt(input.joinToString(separator = "") { it }.length.toDouble()).toInt()
+    println(size)
+    val trees = input.joinToString(separator = "") { it }.mapIndexed { index, c ->
+        val x = index / size
+        val y = index % size
+        Tree(Point2d(x, y), c.digitToInt())
+    }
+    trees.forEach { println("${it.first.x},${it.first.y}   ${it.second}") }
+    println(size)
     println(day.part1())
     println(day.part2())
 }
 
 class Day8(input: List<String>) {
     private val trees = input.mapIndexed { y, row ->
-        row.mapIndexed { x, s -> Tree(Point2d(x, y), s.code) }
+        row.mapIndexed { x, s -> Tree(Point2d(x, y), s.digitToInt()) }
     }.flatten()
 
     init {
