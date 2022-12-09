@@ -70,7 +70,7 @@ class Structures {
         infix fun sameColumn(that: Point2d): Boolean =
             x == that.x
 
-        fun neighbors(): List<Point2d> =
+        private fun neighbors() =
             listOf(
                 Point2d(x, y + 1),
                 Point2d(x, y - 1),
@@ -78,13 +78,14 @@ class Structures {
                 Point2d(x - 1, y)
             )
 
-        fun allNeighbors(): List<Point2d> =
-            neighbors() + listOf(
-                Point2d(x - 1, y - 1),
-                Point2d(x - 1, y + 1),
-                Point2d(x + 1, y - 1),
-                Point2d(x + 1, y + 1)
-            )
+        private fun corners() = listOf(
+            Point2d(x - 1, y - 1),
+            Point2d(x - 1, y + 1),
+            Point2d(x + 1, y - 1),
+            Point2d(x + 1, y + 1)
+        )
+
+        private fun allNeighbors() = neighbors() + corners()
 
         fun move(dir: String): Point2d {
             return when (dir) {
@@ -99,24 +100,16 @@ class Structures {
         }
 
         fun follow(other: Point2d): Point2d {
-            when {
-                other == this -> return this
-                other in allNeighbors() -> return this
-                sameRow(other) -> {
-                   return  if (other.x > x) move("R") else move("L")
-
-                }
-
-                sameColumn(other) -> {
-                    return if (other.y > y) move("U") else move("D")
-
-                }
-
+            val right = other.x > x
+            val up = other.y > y
+            return when {
+                other in allNeighbors() + this -> this
+                sameRow(other) -> if (right) move("R") else move("L")
+                sameColumn(other) -> if (up) move("U") else move("D")
                 else -> {
-                    val step1 = if (other.x > x) move("R") else move("L")
-                    return if (other.y > step1.y) step1.move("U") else step1.move("D")
+                    val step1 = if (right) move("R") else move("L")
+                    if (up) step1.move("U") else step1.move("D")
                 }
-
             }
         }
     }
