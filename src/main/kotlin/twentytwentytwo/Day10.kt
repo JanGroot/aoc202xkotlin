@@ -36,38 +36,26 @@ class Day10(private val input: List<String>) {
     }
 
     fun part2(): Int {
-        val lines = intArrayOf(40, 80, 120, 160, 200, 240)
         var cycle = 0
         var value = 1
         var row = ""
         input.forEach {
             when (it) {
                 "noop" -> {
+                    row += if (cycle % 40 in value-1 ..value + 1 ) "#" else "."
                     cycle++
-                    row += if (cycle % 40 in value -1..value +1) "#" else "."
-                    if (cycle in lines) {
-                        println(row)
-                        row = ""
-                    }
                 }
                 else -> {
+                    row += if (cycle % 40 in value-1..value + 1) "#" else "."
                     cycle++
-                    row += if (cycle % 40 in value-1..value +1) "#" else "."
-                    if (cycle in lines) {
-                        println(row)
-                        row = ""
-                    }
+                    row += if (cycle % 40 in value-1..value + 1) "#" else "."
+                    cycle++
                     value += it.split(" ")[1].toInt()
-                    cycle++
-                    row += if (cycle % 40  in value-1..value +1) "#" else "."
-                    if (cycle in lines) {
-                        println(row)
-                        row = ""
-                    }
                 }
-
             }
         }
+        row.chunked(40).forEach { println(it) }
+
         return 0
     }
 }
