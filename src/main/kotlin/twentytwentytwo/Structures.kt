@@ -62,7 +62,7 @@ class Structures {
         }
     }
 
-    data class Point2d(val x: Int, val y: Int) {
+    data class Point2d(val x: Int, val y: Int, var value: Char = ' ') {
 
         infix fun sameRow(that: Point2d): Boolean =
             y == that.y
@@ -70,7 +70,7 @@ class Structures {
         infix fun sameColumn(that: Point2d): Boolean =
             x == that.x
 
-        private fun neighbors() =
+        fun neighbors() =
             listOf(
                 Point2d(x, y + 1),
                 Point2d(x, y - 1),
