@@ -14,7 +14,7 @@ fun main() {
 
 class Day12(private val input: List<String>) {
     private val land = input.mapIndexed { y, row ->
-        row.mapIndexed { x, s -> Point2d(x, y,s ) }
+        row.mapIndexed { x, s -> Point2d(x, y, s) }
     }.flatten()
 
     fun part1(): Int {
@@ -30,7 +30,7 @@ class Day12(private val input: List<String>) {
         val visited = hashSetOf<Point2d>()
         visited.add(start)
 
-        while ( !queue.isEmpty) {
+        while (!queue.isEmpty) {
             val (node, index) = queue.dequeue()!!
             fun search(point: Point2d) = land.firstOrNull { it.x == point.x && it.y == point.y }
 
@@ -45,8 +45,6 @@ class Day12(private val input: List<String>) {
         }
         return Int.MAX_VALUE
     }
-
-
 }
 
 
