@@ -1,5 +1,8 @@
 package twentytwentytwo
 
+import kotlin.math.absoluteValue
+import kotlin.math.sign
+
 typealias Visitor<T> = (Structures.TreeNode<T>) -> Unit
 
 class Structures {
@@ -84,6 +87,17 @@ class Structures {
             Point2d(x + 1, y - 1),
             Point2d(x + 1, y + 1)
         )
+
+        infix fun lineTo(that: Point2d): List<Point2d> {
+            val xDelta = (that.x - x).sign
+            val yDelta = (that.y - y).sign
+            val steps = maxOf((x - that.x).absoluteValue, (y - that.y).absoluteValue)
+            return (1..steps).scan(this) { last, _ -> Point2d(last.x + xDelta, last.y + yDelta) }
+        }
+
+        val down by lazy { Point2d(x, y + 1) }
+        val downLeft by lazy { Point2d(x - 1, y + 1) }
+        val downRight by lazy { Point2d(x + 1, y + 1) }
 
         private fun allNeighbors() = neighbors() + corners()
 
