@@ -1,5 +1,6 @@
 package twentytwentytwo
 
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
@@ -72,6 +73,29 @@ class Structures {
 
         infix fun sameColumn(that: Point2d): Boolean =
             x == that.x
+
+        fun distanceTo(other: Point2d) = kotlin.math.abs(x - other.x) + kotlin.math.abs(y - other.y)
+
+        fun manArea(dist: Int, row: Int): MutableSet<Point2d> {
+            var area = mutableSetOf<Point2d>()
+            ((y - dist)..(y + dist + 1)).forEachIndexed { dx, dy ->
+                if (dy == row) {
+                    ((x - dx)..(x + dx)).forEach {
+                        val p = Point2d(it, dy)
+                        if (p.distanceTo(this) <= dist) {
+                            area.add(p)
+                        }
+                    }
+                }
+            }
+            return area
+        }
+
+        fun manRanges(dist: Int, row: Int): IntRange? {
+            val width = dist - abs(y - row)
+            return if (width > 0) x - width..x + width else null
+        }
+
 
         fun neighbors() =
             listOf(
