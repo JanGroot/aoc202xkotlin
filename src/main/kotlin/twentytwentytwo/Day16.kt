@@ -19,22 +19,25 @@ class Day16(input: List<String>) {
     init {
         valves = input.map {
             val name = it.substringAfter("Valve ").substringBefore(" has")
-            name to graphList.createVertex(Valve(name))
+            val rate = it.substringAfter("=").substringBefore(";").toInt()
+            name to graphList.createVertex(Valve(name, rate = rate))
         }.toMap()
         input.forEach {
             val name = it.substringAfter("Valve ").substringBefore(" has")
             val source = valves[name]!!
-            val weight = it.substringAfter("=").substringBefore(";").toInt()
             val edges = it.substringAfter("to valve").split(", ")
             edges.forEach {
                 val destination = valves[it.filter { it.isUpperCase() }]!!
-                graphList.addDirectedEdge(source, destination, weight)
+                graphList.addDirectedEdge(source, destination)
             }
         }
     }
     fun part1(): Int {
+        println(graphList)
         val start = valves["AA"]
+        var pressure = 0
         (1 until 31).map {
+            pressure += valves.values.filter { it.data.open }.map { it.data.rate }.sum()
 
         }
 
@@ -46,7 +49,7 @@ class Day16(input: List<String>) {
     }
 }
 
-data class Valve(val name: String, var open: Boolean = false)
+data class Valve(val name: String, var open: Boolean = false, var rate: Int = 0)
 
 data class Vertex<T>(val index: Int, val data: T)
 data class Edge<T>(val source: Vertex<T>, val destination: Vertex<T>, val weight: Int? = null)
@@ -71,6 +74,4 @@ class AdjacencyList<T> {
             }
         }
     }
-
-    fun getVertex(val name: String)
 }
