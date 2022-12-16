@@ -36,8 +36,9 @@ class Day16(input: List<String>) {
         println(graphList)
         var location = valves["AA"]
         var pressure = 0
+        var visited = IntArray(valves.size)
         (1 until 31).map {
-            pressure += valves.values.filter { it.data.open }.map { it.data.rate }.sum()
+            pressure +=  visited
 
 
         }
@@ -50,7 +51,7 @@ class Day16(input: List<String>) {
     }
 }
 
-data class Valve(val name: String, var open: Boolean = false, var rate: Int = 0)
+data class Valve(val name: String, var rate: Int = 0)
 
 data class Vertex<T>(val index: Int, val data: T)
 data class Edge<T>(val source: Vertex<T>, val destination: Vertex<T>, val weight: Int? = null)
