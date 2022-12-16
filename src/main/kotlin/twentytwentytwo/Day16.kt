@@ -15,6 +15,8 @@ class Day16(input: List<String>) {
 
     private val graph: Graph<Valve>
     private val valves: Map<String, Valve>
+    private val valveMapMap:  Map<Valve, Map<Valve, Int>>
+    private val paths: Map<Valve, Map<Valve, Int>>
 
     init {
         valves = input.associate {
@@ -22,19 +24,16 @@ class Day16(input: List<String>) {
             val rate = it.substringAfter("=").substringBefore(";").toInt()
             name to Valve(name, rate = rate)
         }
-        graph = Graph(input.associate {
+        valveMapMap = input.associate {
             val name = it.substringAfter("Valve ").substringBefore(" has")
             val edges = it.substringAfter("to valve").split(", ")
             valves[name]!! to edges.associate { valves[it.filter { it.isUpperCase() }]!! to 1 }
-        })
+        }
+        graph = Graph(valveMapMap)
+        paths = graph.findAllShortestPath()
     }
     fun part1(): Int {
-       var destMap = valves.values.associateWith { s ->
-           valves.values.associateWith { d -> graph.findShortestPath(s, d) }
-       }
-
-        println(destMap)
-        return destMap.size
+        return 0;
     }
 
     fun part2(): Int {

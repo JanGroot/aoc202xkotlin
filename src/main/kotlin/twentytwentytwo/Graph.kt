@@ -2,6 +2,7 @@ package twentytwentytwo
 
 class Graph<T>(private val weightedPaths: Map<T, Map<T, Int>>) {
 
+    //dijkstra
     fun findShortestPath(start: T, end: T): Int {
         if (start == end) return 0
         val paths = recurseFindShortestPath(NodePaths(start, end)).paths
@@ -15,6 +16,11 @@ class Graph<T>(private val weightedPaths: Map<T, Map<T, Int>>) {
             recurseFindShortestPath(nextNode)
         }
     }
+
+    //https://en.wikipedia.org/wiki/Floyd–Warshall_algorithm
+    fun findAllShortestPath() =
+        weightedPaths.keys.associateWith { k -> weightedPaths.keys.associateWith { findShortestPath(k, it) } }
+
 }
 
 data class NodePaths<T>(private val node: T, private  val end: T, val paths: Map<T, Int> = emptyMap()) {
