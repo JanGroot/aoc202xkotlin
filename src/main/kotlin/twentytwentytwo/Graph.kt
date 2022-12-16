@@ -3,6 +3,7 @@ package twentytwentytwo
 class Graph<T>(private val weightedPaths: Map<T, Map<T, Int>>) {
 
     fun findShortestPath(start: T, end: T): Int {
+        if (start == end) return 0
         val paths = recurseFindShortestPath(NodePaths(start, end)).paths
         return paths.getValue(end)
     }

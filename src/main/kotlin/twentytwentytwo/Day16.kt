@@ -6,44 +6,35 @@ fun main() {
     val test = Day16(testInput)
     val day = Day16(input)
     println(test.part1())
-    println(test.part2())
+  //  println(test.part2())
     println(day.part1())
-    println(day.part2())
+   // println(day.part2())
 }
 
 class Day16(input: List<String>) {
 
-    private val graphList = AdjacencyList<Valve>()
-    private val valves: Map<String, Vertex<Valve>>
+    private val graph: Graph<Valve>
+    private val valves: Map<String, Valve>
 
     init {
-        valves = input.map {
+        valves = input.associate {
             val name = it.substringAfter("Valve ").substringBefore(" has")
             val rate = it.substringAfter("=").substringBefore(";").toInt()
-            name to graphList.createVertex(Valve(name, rate = rate))
-        }.toMap()
-        input.forEach {
-            val name = it.substringAfter("Valve ").substringBefore(" has")
-            val source = valves[name]!!
-            val edges = it.substringAfter("to valve").split(", ")
-            edges.forEach {
-                val destination = valves[it.filter { it.isUpperCase() }]!!
-                graphList.addDirectedEdge(source, destination)
-            }
+            name to Valve(name, rate = rate)
         }
+        graph = Graph(input.associate {
+            val name = it.substringAfter("Valve ").substringBefore(" has")
+            val edges = it.substringAfter("to valve").split(", ")
+            valves[name]!! to edges.associate { valves[it.filter { it.isUpperCase() }]!! to 1 }
+        })
     }
     fun part1(): Int {
-        println(graphList)
-        var location = valves["AA"]
-        var pressure = 0
-        var visited = IntArray(valves.size)
-        (1 until 31).map {
-            pressure +=  visited
+       var destMap = valves.values.associateWith { s ->
+           valves.values.associateWith { d -> graph.findShortestPath(s, d) }
+       }
 
-
-        }
-
-        error("not found")
+        println(destMap)
+        return destMap.size
     }
 
     fun part2(): Int {
@@ -52,28 +43,3 @@ class Day16(input: List<String>) {
 }
 
 data class Valve(val name: String, var rate: Int = 0)
-
-data class Vertex<T>(val index: Int, val data: T)
-data class Edge<T>(val source: Vertex<T>, val destination: Vertex<T>, val weight: Int? = null)
-class AdjacencyList<T> {
-    private val adjacencyMap = mutableMapOf<Vertex<T>, ArrayList<Edge<T>>>()
-    fun createVertex(data: T): Vertex<T> {
-        val vertex = Vertex(adjacencyMap.count(), data)
-        adjacencyMap[vertex] = arrayListOf()
-        return vertex
-    }
-
-    fun addDirectedEdge(source: Vertex<T>, destination: Vertex<T>, weight: Int? = 0) {
-        val edge = Edge(source, destination, weight)
-        adjacencyMap[source]?.add(edge)
-    }
-
-    override fun toString(): String {
-        return buildString {
-            adjacencyMap.forEach { (vertex, edges) ->
-                val edgeString = edges.joinToString { it.destination.data.toString() }
-                append("${vertex.data} -> [$edgeString]\n")
-            }
-        }
-    }
-}
