@@ -34,10 +34,11 @@ class Day16(input: List<String>) {
     }
     fun part1(): Int {
         println(graphList)
-        val start = valves["AA"]
+        var location = valves["AA"]
         var pressure = 0
         (1 until 31).map {
             pressure += valves.values.filter { it.data.open }.map { it.data.rate }.sum()
+
 
         }
 
