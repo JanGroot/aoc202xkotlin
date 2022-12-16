@@ -1,6 +1,7 @@
 package twentytwentytwo
 
 import java.lang.Integer.max
+import java.math.BigInteger
 
 fun main() {
     val input = {}.javaClass.getResource("input-16.txt")!!.readText().linesFiltered { it.isNotEmpty() };
@@ -34,20 +35,24 @@ class Day16(input: List<String>) {
     fun part1(): Int {
         val volcano = Volcano(paths, valves["AA"]!!)
         volcano.findHighestDeltaP()
+        println(volcano.counter)
         return volcano.pressure
     }
 
     fun part2(): Int {
         val volcano = Volcano(paths, valves["AA"]!!, 26)
         volcano.findHighestDeltaP(secondPass = true)
+        println(volcano.counter)
         return volcano.pressure
     }
 }
 
 class Volcano(private val paths: Map<Valve, Map<Valve, Int>>, private val start: Valve, private val timeToBlow: Int = 30) {
     var pressure = 0
+    var counter: BigInteger = BigInteger.ZERO
     fun findHighestDeltaP(from: Valve = start, cache: Set<Valve> = mutableSetOf(), deltaT: Int = 0, deltaP: Int = 0, secondPass: Boolean = false) {
         pressure = max(pressure, deltaP)
+        counter++
         paths[from]!!
             .filter { (destination, distance) ->
             (!cache.contains(destination) && deltaT + distance + 1 < timeToBlow) }
@@ -60,7 +65,7 @@ class Volcano(private val paths: Map<Valve, Map<Valve, Int>>, private val start:
                     secondPass
                 )
             }
-        if (secondPass) findHighestDeltaP(start, cache, deltaT = 0, deltaP)
+        if (secondPass) findHighestDeltaP(start, cache, deltaP = deltaP)
     }
 }
 
