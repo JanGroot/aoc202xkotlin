@@ -4,7 +4,7 @@ import twentytwentytwo.Structures.Point2d
 import java.nio.file.Files.move
 
 fun main() {
-    val input = {}.javaClass.getResource("input-17.txt")!!.readText();
+    val input = {}.javaClass.getResource("input-17.txt")!!.readText().trim();
     val test = {}.javaClass.getResource("input-17-1.txt")!!.readText();
     val dayTest = Day17(test)
     println(dayTest.part1())
@@ -21,7 +21,7 @@ class Day17(private val input: String) {
 
     fun part1(): Int {
         val cave = Cave(gas = input)
-        (0 .. 2022).forEach {
+        (0 until 2022).forEach {
             var factory = ShapeFactory(y = cave.top() + 4)
             val shape = when (shapes[it % shapes.size]) {
                 "underscore" -> factory.underScore()
@@ -34,8 +34,8 @@ class Day17(private val input: String) {
                 }
             }
             cave.drop(shape!!)
-            println("$it -> ${shapes[it % shapes.size]} -> ${cave.top()}")
         }
+        println(cave.counter)
         return cave.top()
     }
 
@@ -70,10 +70,12 @@ class Cave(val width: Int = 7, val gas: String) {
     val stack =
         mutableSetOf<Point2d>(Point2d(1, 0), Point2d(2, 0), Point2d(3, 0), Point2d(4, 0), Point2d(5, 0), Point2d(6, 0))
     var move = 0
+    var counter = 0
 
     fun drop(shape: Shape) {
         var ds = shape
         val instruction = gas[move]
+        counter++
         when (instruction) {
             '<' -> ds = ds.left()
             '>' -> ds = ds.right()
