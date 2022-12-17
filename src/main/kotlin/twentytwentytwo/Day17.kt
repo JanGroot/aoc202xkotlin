@@ -1,16 +1,15 @@
 package twentytwentytwo
 
 import twentytwentytwo.Structures.Point2d
-import java.nio.file.Files.move
 
 fun main() {
     val input = {}.javaClass.getResource("input-17.txt")!!.readText().trim();
     val test = {}.javaClass.getResource("input-17-1.txt")!!.readText();
     val dayTest = Day17(test)
-    println(dayTest.part1())
+    //println(dayTest.part1())
     //println(dayTest.part2())
     val day = Day17(input)
-    println(day.part1())
+    //println(day.part1())
     println(day.part2())
 }
 
@@ -53,10 +52,7 @@ class Day17(private val input: String) {
                     null
                 }
             }
-            if (it % 10_000 == 0) {
-                println("$it -> ${cave.counter}")
-            }
-            cave.drop(shape!!)
+            cave.drop(shape!!, it)
         }
         println(cave.counter)
         return cave.top()
@@ -90,8 +86,13 @@ class Cave(val width: Int = 7, val gas: String) {
         mutableSetOf<Point2d>(Point2d(1, 0), Point2d(2, 0), Point2d(3, 0), Point2d(4, 0), Point2d(5, 0), Point2d(6, 0))
     var move = 0
     var counter = 0
+    var lastPacket = 0
+    var lastHeigth =0
+    var deltaP = 0
+    var deltaH = 0
 
-    fun drop(shape: Shape) {
+
+    fun drop(shape: Shape, i: Int = 0) {
         var ds = shape
         val instruction = gas[move]
         counter++
@@ -100,9 +101,19 @@ class Cave(val width: Int = 7, val gas: String) {
             '>' -> ds = ds.right()
         }
         move = (move + 1) % gas.length
+        if(move%10092 == 0) {
+            if ((i - lastPacket) == deltaP ) {
+                println("loop every ${deltaP}")
+                println("height will be: ${1000000000000/deltaP * deltaH + lastHeigth}")
+            }
+            deltaP = i - lastPacket
+            deltaH = top() - lastHeigth
+            lastPacket = i
+            lastHeigth = top()
+        }
         if (ds.down().any { it in stack }) {
             stack += ds
-        } else drop(ds.down())
+        } else drop(ds.down(), i)
     }
 
     fun top(): Int = stack.maxOf { it.y }
