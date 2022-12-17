@@ -8,10 +8,10 @@ fun main() {
     val test = {}.javaClass.getResource("input-17-1.txt")!!.readText();
     val dayTest = Day17(test)
     println(dayTest.part1())
-    // println(dayTest.part2())
+    //println(dayTest.part2())
     val day = Day17(input)
     println(day.part1())
-    // println(day.part2())
+    println(day.part2())
 }
 
 class Day17(private val input: String) {
@@ -40,7 +40,26 @@ class Day17(private val input: String) {
     }
 
     fun part2(): Int {
-        error("not found")
+        val cave = Cave(gas = input)
+        (0 until 1000000).forEach {
+            var factory = ShapeFactory(y = cave.top() + 4)
+            val shape = when (shapes[(it % shapes.size).toInt()]) {
+                "underscore" -> factory.underScore()
+                "plus" -> factory.plus()
+                "corner" -> factory.corner()
+                "pipe" -> factory.pipe()
+                "square" -> factory.square()
+                else -> {
+                    null
+                }
+            }
+            if (it % 10_000 == 0) {
+                println("$it -> ${cave.counter}")
+            }
+            cave.drop(shape!!)
+        }
+        println(cave.counter)
+        return cave.top()
     }
 
 
