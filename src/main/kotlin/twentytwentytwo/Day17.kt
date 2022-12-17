@@ -104,7 +104,7 @@ class Cave(val width: Int = 7, val gas: String) {
         if(move%10092 == 0) {
             if ((i - lastPacket) == deltaP ) {
                 println("loop every ${deltaP}")
-                println("height will be: ${1000000000000/deltaP * deltaH + lastHeigth}")
+                println("height will be: ${(1000000000000 - i)/deltaP * deltaH + lastHeigth}")
             }
             deltaP = i - lastPacket
             deltaH = top() - lastHeigth
@@ -113,6 +113,9 @@ class Cave(val width: Int = 7, val gas: String) {
         }
         if (ds.down().any { it in stack }) {
             stack += ds
+            if (i == 2920) {
+                println(top())
+            }
         } else drop(ds.down(), i)
     }
 
