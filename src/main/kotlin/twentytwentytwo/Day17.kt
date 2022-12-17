@@ -1,6 +1,7 @@
 package twentytwentytwo
 
 import twentytwentytwo.Structures.Point2d
+import java.nio.file.Files.move
 
 fun main() {
     val input = {}.javaClass.getResource("input-17.txt")!!.readText();
@@ -20,7 +21,7 @@ class Day17(private val input: String) {
 
     fun part1(): Int {
         val cave = Cave(gas = input)
-        (0 until 2022).forEach {
+        (0 .. 2022).forEach {
             var factory = ShapeFactory(y = cave.top() + 4)
             val shape = when (shapes[it % shapes.size]) {
                 "underscore" -> factory.underScore()
@@ -33,6 +34,7 @@ class Day17(private val input: String) {
                 }
             }
             cave.drop(shape!!)
+            println("$it -> ${shapes[it % shapes.size]} -> ${cave.top()}")
         }
         return cave.top()
     }
@@ -72,7 +74,6 @@ class Cave(val width: Int = 7, val gas: String) {
     fun drop(shape: Shape) {
         var ds = shape
         val instruction = gas[move]
-        println()
         when (instruction) {
             '<' -> ds = ds.left()
             '>' -> ds = ds.right()
@@ -85,9 +86,9 @@ class Cave(val width: Int = 7, val gas: String) {
 
     fun top(): Int = stack.maxOf { it.y }
 
-    fun Shape.left() = if (any { it.x == 0 }) this else this.map { it.move("L") }.toSet() // also check bound in stack
+    fun Shape.left() = if (any { it.x == 0 } || this.map{it.move("L")}.any{ it in stack}) this else this.map { it.move("L") }.toSet() // also check bound in stack
 
-    fun Shape.right() = if (any { it.x == width - 1 }) this else this.map { it.move("R") }.toSet() //also check bound in stack
+    fun Shape.right() = if (any { it.x == width - 1 }|| this.map{it.move("R")}.any{ it in stack}) this else this.map { it.move("R") }.toSet() //also check bound in stack
 
     fun Shape.down() = this.map { it.move("D") }.toSet()
 
