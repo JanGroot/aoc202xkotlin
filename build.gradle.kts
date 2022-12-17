@@ -13,7 +13,6 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    implementation("com.github.shiguruikai:combinatoricskt:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     testImplementation(kotlin("test-junit5"))
 }
