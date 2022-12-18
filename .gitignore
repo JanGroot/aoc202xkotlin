@@ -3,4 +3,4 @@
 /build/
 /out/
 *.iml
-/getInput.http
+/http-client.private.env.json

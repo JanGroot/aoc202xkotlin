@@ -1,0 +1,12 @@
+GET https://adventofcode.com/2022/day/{{day}}/input
+Cookie:session={{cookie}}}
+Accept: application/json
+
+>> {{$projectRoot}}/src/main/resources/twentytwentytwo/input-{{day}}.txt
+###
+
+GET https://adventofcode.com/2022/leaderboard/private/view/2265214.json
+Cookie:session={{cookie}}
+Accept: application/json
+
+>> {{$projectRoot}}/src/main/resources/twentytwentytwo/leaderboard.json
