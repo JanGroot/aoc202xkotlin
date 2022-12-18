@@ -1,6 +1,7 @@
 package twentytwentytwo
 
 import twentytwentytwo.Structures.Point2d
+import kotlin.math.floor
 
 fun main() {
     val input = {}.javaClass.getResource("input-17.txt")!!.readText().trim();
@@ -90,6 +91,7 @@ class Cave(val width: Int = 7, val gas: String) {
     var lastHeigth =0
     var deltaP = 0
     var deltaH = 0
+    var countdown = 100000000000;
 
 
     fun drop(shape: Shape, i: Int = 0) {
@@ -101,19 +103,26 @@ class Cave(val width: Int = 7, val gas: String) {
             '>' -> ds = ds.right()
         }
         move = (move + 1) % gas.length
-        if(move%10092 == 0) {
+        if(move%(gas.length * 5)  == 0) {
             if ((i - lastPacket) == deltaP ) {
+                println("current height ${top()}")
+                println("current blocks ${i}")
                 println("loop every ${deltaP}")
-                println("height will be: ${(1000000000000 - i)/deltaP * deltaH + lastHeigth}")
+                println("height delta: ${deltaH}")
+                var togo = 1000000000000 - i
+                println("${(togo/deltaP) * deltaP}")
+                countdown =  i + togo%deltaP
+                println("height will be: ${(togo/deltaP * deltaH)} plus another ${togo%deltaP} blocks")
             }
             deltaP = i - lastPacket
             deltaH = top() - lastHeigth
             lastPacket = i
             lastHeigth = top()
         }
+
         if (ds.down().any { it in stack }) {
             stack += ds
-            if (i == 2920) {
+            if(countdown == i.toLong()) {
                 println(top())
             }
         } else drop(ds.down(), i)
