@@ -44,9 +44,11 @@ class Day18(private val input: List<String>) {
         }
 
         private tailrec fun recurseRemoveExposed(node: Point3d, connectedNodes: Set<Point3d>) {
-            if (node.isExposed()) potentialExposed.removeAll(connectedNodes + node)
+            if (node.isExposed()) {
+                potentialExposed.removeAll(connectedNodes + node)
+            }
             else node.neighbors().filter { !it.isConnected(connectedNodes) && it !in cubes }.forEach { connection ->
-                return recurseRemoveExposed(node, connectedNodes + connection)
+                return recurseRemoveExposed(connection, connectedNodes + node)
             }
         }
         private fun Point3d.isExposed() = x !in xBound || y !in yBound || z !in zBound
