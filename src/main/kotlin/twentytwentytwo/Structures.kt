@@ -66,6 +66,20 @@ class Structures {
         }
     }
 
+    data class Point3d(val x: Int, val y: Int, val z: Int) {
+        fun neighbors() =
+            listOf(
+                Point3d(x, y + 1, z),
+                Point3d(x, y - 1, z),
+                Point3d(x + 1, y, z),
+                Point3d(x - 1, y, z),
+                Point3d(x, y, z + 1),
+                Point3d(x, y, z - 1),
+            )
+
+
+    }
+
     data class Point2d(val x: Int, val y: Int, var value: Char = ' ') {
 
         infix fun sameRow(that: Point2d): Boolean =
