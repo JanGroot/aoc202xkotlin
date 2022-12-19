@@ -23,7 +23,7 @@ class Day19(private val input: List<String>) {
         val obsidian = Robot("obsidian", mapOf("ore" to split[5].toInt(), "clay" to split[6].toInt()))
         val geode = Robot("geode", mapOf("ore" to split[8].toInt(), "obsidian" to split[9].toInt()))
         Blueprint(id, mapOf(ore, clay, obsidian, geode))
-    }.also { println(it) }
+    }
 
     fun part1(): Int {
         return blueprints.maxOf { it.maxGeodes() }
@@ -38,33 +38,33 @@ class Day19(private val input: List<String>) {
 class Blueprint(val id: Int, val robots: Map<String, Map<String, Int>>) {
 
     val cache = mutableSetOf<State>()
+    var geodeMax = 0
 
     fun maxGeodes(): Int {
-        return step((mapOf("ore" to 1) to (emptyMap<String, Int>())) to 0)
+        step((mapOf("ore" to 1) to (emptyMap<String, Int>())) to 1)
+        return maxGeodes();
     }
 
-    fun step(state: State): Int {
-        if (state.getStep() > 24) return state.inventory()["geode"] ?: 0 // done
+    fun step(state: State) {
+        if (state.getStep() == 24) return
         if (state !in cache) {
+            geodeMax = max(geodeMax, state.inventory()["geode"] ?: 0)
             cache.add(state)
             val produced = produce(state.producers(), state.inventory())
-            return max(
-                step((state.producers() to produced) to state.getStep() + 1),
-                buyRobots((state.producers() to produced) to state.getStep())
-            )
+            buyRobots((state.producers() to produced) to state.getStep())
+            step((state.producers() to produced) to state.getStep() + 1)
+
         } else {
-            return state.inventory()["geode"] ?: 0
+            geodeMax = max(geodeMax, state.inventory()["geode"] ?: 0)
         }
     }
 
-    private fun buyRobots(state: State): Int {
-        var geodes = state.inventory()["geode"] ?: 0
+    private fun buyRobots(state: State) {
         robots.keys.forEach {
-           if( canBuyRobot(it, state.inventory()) ) {
-                geodes = max(geodes, step(buyRobot(it, state)))
+            if (canBuyRobot(it, state.inventory()) && shouldBuyRobot(it, state.producers()[it] ?: 0)) {
+                step(buyRobot(it, state))
             }
         }
-        return geodes
     }
 
     private fun buyRobot(robot: String, state: State): State {
@@ -72,13 +72,17 @@ class Blueprint(val id: Int, val robots: Map<String, Map<String, Int>>) {
             it.key to state.inventory()[it.key]!! - it.value
         }
         val robots = (state.producers()[robot] ?: 0) + 1
-        return ((state.producers() + (robot to robots) to state.inventory() + costs) to state.getStep() +1)
+        return ((state.producers() + (robot to robots) to state.inventory() + costs) to state.getStep() + 1)
     }
 
     private fun canBuyRobot(robot: String, inventory: Map<String, Int>): Boolean =
         robots[robot]!!.all {
-            inventory[it.key] ?: 0 >= it.value
+            ( inventory[it.key] ?: 0 )>= it.value
         }
+
+    private fun shouldBuyRobot(robot: String, number: Int) =
+        (robot == "geode") || robots.filterValues { it.containsKey(robot) }.values.all { it[robot]!! > number }
+
 
     private fun produce(producers: Map<String, Int>, inventory: Map<String, Int>): Map<String, Int> = producers.map {
         it.key to inventory.getOrDefault(it.key, 0) + it.value
