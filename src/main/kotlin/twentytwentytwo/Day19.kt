@@ -1,5 +1,7 @@
 package twentytwentytwo
 
+import twentytwentytwo.Structures.ArrayListQueue
+
 
 fun main() {
     val input = {}.javaClass.getResource("input-19.txt")!!.readText().linesFiltered { it.isNotEmpty() };
@@ -43,31 +45,49 @@ class Day19(private val input: List<String>) {
 
 class Blueprint(
     val id: Int,
-    val oreCost: Int,
-    val clayCostOre: Int,
-    val obsidianCostOre: Int,
-    val obsidianCostClay: Int,
-    val geodeCostOre: Int,
-    val geodeCostObsidian: Int,
+    private val oreCost: Int,
+    private val clayCostOre: Int,
+    private val obsidianCostOre: Int,
+    private val obsidianCostClay: Int,
+    private val geodeCostOre: Int,
+    private val geodeCostObsidian: Int,
     private val oreLimit: Int,
     private val clayLimit: Int,
     private val obsidianLimit: Int
 ) {
-    val cache = mutableMapOf<State, Int>()
-
 
     fun maxGeodes(state: State): Int {
-        if (state.step == 0) return -1
-        if (cache.containsKey(state)) return cache[state]!!
-        val current = state.produce()
-        var max = maxGeodes(current)
-        arrayOf("obsidian", "clay", "ore", "geode").forEach {
-            if (current.canBuy(it) && current.shouldBuy(it)) {
-                max = maxOf(max, maxGeodes(current.buy(it)))
+        var max = 0
+        var cache = mutableSetOf<State>()
+        var queue = ArrayListQueue<State>()
+        queue.enqueue(state)
+        while (!queue.isEmpty) {
+            var current = queue.dequeue()!!
+            if (!cache.contains(current)) {
+                cache.add(current)
+                if (current.step == 1) {
+                    max = maxOf(max, current.geode)
+                } else {
+                    val next = current.produce()
+                    if (current.canBuy("geode")) {
+                        queue.enqueue(current.buy("geode"))
+                    } else if (current.canBuy("obsidian") && current.shouldBuy("obsidian")) {
+                        queue.enqueue(current.buy("obsidian"))
+                    } else {
+                        if (current.canBuy("clay") && current.shouldBuy("clay")) {
+                            queue.enqueue(current.buy("clay"))
+                        }
+                        if (current.canBuy("ore") && current.shouldBuy("ore")){
+                            queue.enqueue(current.buy("ore"))
+                        }
+                        if (!current.canBuy("ore") || !current.canBuy("clay") ){
+                            queue.enqueue(next)
+                        }
+                    }
+                }
             }
         }
-        cache[state] = maxOf(max, current.geode)
-        return max;
+        return max
     }
 
     private fun State.produce(): State {
