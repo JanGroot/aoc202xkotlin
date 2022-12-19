@@ -12,7 +12,7 @@ fun main() {
 }
 
 class Day19(private val input: List<String>) {
-    val blueprints  = input.mapIndexed { index, s ->
+    val blueprints = input.mapIndexed { index, s ->
         val id = index + 1
         val split = s.split("robot costs ", " ore. Each ", " ore and ", " clay. Each geode ", " obsidian.")
         println(split)
@@ -20,7 +20,7 @@ class Day19(private val input: List<String>) {
         val clay = Robot("clay", mutableListOf("ore" to split[3].toInt()))
         val obsidian = Robot("obsidian", mutableListOf("ore" to split[5].toInt(), "clay" to split[6].toInt()))
         val geode = Robot("geode", mutableListOf("ore" to split[8].toInt(), "obsidian" to split[9].toInt()))
-        Blueprint(id, listOf(ore,clay,obsidian,geode))
+        Blueprint(id, listOf(ore, clay, obsidian, geode))
     }.also { println(it) }
 
     fun part1(): Int {
@@ -32,24 +32,35 @@ class Day19(private val input: List<String>) {
     }
 }
 
-data class Blueprint(val id: Int,val robots: List<Robot>) {
+data class Blueprint(val id: Int, val robots: List<Robot>) {
+
+    val memoize = mutableMapOf<State, Int>()
+
+
+    val max = 0
 
     fun maxGeodes() {
 
     }
-    tailrec fun step(state: Pair<MutableMap<Robot, Int>,MutableMap<String, Int>>, step: Int): Int {
-        val (producers, inventory) = state
-        if (step > 24) return inventory["geode"] ?: 0
+
+    tailrec fun step(state: State): Int {
+        return memoize.computeIfAbsent(state) {
+            val (comp1, step) = state
+            val (producers, inventory) = comp1
+            if (step > 24) return@computeIfAbsent inventory["geode"] ?: 0
 
 
-        var produced = produce(producers, inventory)
-        step(state, step + 1)
+            var produced = produce(producers, inventory)
+            step((producers to inventory) to step +1)
+        }
     }
 
     private fun produce(producers: Map<Robot, Int>, inventory: Map<String, Int>): Map<String, Int> = producers.map {
         it.key.type to inventory.getOrDefault(it.key.type, 0) + it.value
     }.toMap()
 }
+
 data class Robot(val type: String, val costs: List<Cost>)
-typealias Cost = Pair<String,Int>
+typealias Cost = Pair<String, Int>
+typealias State = Pair<Pair<MutableMap<Robot, Int>, MutableMap<String, Int>>, Int>
 
