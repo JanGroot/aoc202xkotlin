@@ -32,7 +32,24 @@ class Day19(private val input: List<String>) {
     }
 }
 
-data class Blueprint(val id: Int,val robots: List<Robot>)
+data class Blueprint(val id: Int,val robots: List<Robot>) {
+
+    fun maxGeodes() {
+
+    }
+    tailrec fun step(state: Pair<MutableMap<Robot, Int>,MutableMap<String, Int>>, step: Int): Int {
+        val (producers, inventory) = state
+        if (step > 24) return inventory["geode"] ?: 0
+        produce(producers, inventory)
+        step(state, step + 1)
+    }
+
+    private fun produce(producers: Map<Robot, Int>, inventory: MutableMap<String, Int>) {
+        producers.forEach { (r, i) ->
+            inventory[r.type] = inventory.getOrDefault(r.type, 0) + i
+        }
+    }
+}
 data class Robot(val type: String, val costs: List<Cost>)
 typealias Cost = Pair<String,Int>
 
