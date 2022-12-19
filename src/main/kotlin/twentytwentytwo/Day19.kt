@@ -6,12 +6,12 @@ import twentytwentytwo.Structures.ArrayListQueue
 fun main() {
     val input = {}.javaClass.getResource("input-19.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val test = {}.javaClass.getResource("input-19-1.txt")!!.readText().linesFiltered { it.isNotEmpty() };
-    //val day = Day19(input)
+    val day = Day19(input)
     val testDay = Day19(test)
-    println(testDay.part1())
-    println(testDay.part2())
-    //println(day.part1())
-    //println(day.part2())
+    //println(testDay.part1())
+    //println(testDay.part2())
+    println(day.part1())
+    println(day.part2())
 }
 
 class Day19(private val input: List<String>) {
@@ -35,11 +35,12 @@ class Day19(private val input: List<String>) {
     }
 
     fun part1(): Int {
-        return blueprints.maxOf { it.maxGeodes(State(oreRobot = 1, step = 24)) }
+        return blueprints.sumOf { it.id * it.maxGeodes(State(oreRobot = 1, step = 24)) }
     }
 
     fun part2(): Int {
-        error("not found")
+        return blueprints.take(3).map { it.maxGeodes(State(oreRobot = 1, step = 32)).also { println(it) } }
+            .reduce(Int::times)
     }
 }
 
@@ -65,25 +66,30 @@ class Blueprint(
             var current = queue.dequeue()!!
             if (!cache.contains(current)) {
                 cache.add(current)
-                if (current.step == 1) {
+                if (current.step == 0) {
                     max = maxOf(max, current.geode)
                 } else {
                     val next = current.produce()
                     if (current.canBuy("geode")) {
-                        queue.enqueue(current.buy("geode"))
-                    } else if (current.canBuy("obsidian") && current.shouldBuy("obsidian")) {
-                        queue.enqueue(current.buy("obsidian"))
-                    } else {
-                        if (current.canBuy("clay") && current.shouldBuy("clay")) {
-                            queue.enqueue(current.buy("clay"))
+                        queue.enqueue(next.buy("geode"))
+                    } else
+                        if (current.canBuy("obsidian") && current.shouldBuy("obsidian")) {
+                            queue.enqueue(next.buy("obsidian"))
+                        } else {
+                            if (current.canBuy("ore") && current.shouldBuy("ore")) {
+                                queue.enqueue(next.buy("ore"))
+                            }
+                            if (current.canBuy("clay") && current.shouldBuy("clay")) {
+                                queue.enqueue(next.buy("clay"))
+                            }
+
+
+                                queue.enqueue(next)
+
+
+
+
                         }
-                        if (current.canBuy("ore") && current.shouldBuy("ore")){
-                            queue.enqueue(current.buy("ore"))
-                        }
-                        if (!current.canBuy("ore") || !current.canBuy("clay") ){
-                            queue.enqueue(next)
-                        }
-                    }
                 }
             }
         }
