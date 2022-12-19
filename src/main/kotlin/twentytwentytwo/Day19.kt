@@ -16,11 +16,11 @@ class Day19(private val input: List<String>) {
         val id = index + 1
         val split = s.split("robot costs ", " ore. Each ", " ore and ", " clay. Each geode ", " obsidian.")
         println(split)
-        val ore = Robot("ore", mutableListOf("ore" to split[1].toInt()))
-        val clay = Robot("clay", mutableListOf("ore" to split[3].toInt()))
-        val obsidian = Robot("obsidian", mutableListOf("ore" to split[5].toInt(), "clay" to split[6].toInt()))
-        val geode = Robot("geode", mutableListOf("ore" to split[8].toInt(), "obsidian" to split[9].toInt()))
-        Blueprint(id, listOf(ore, clay, obsidian, geode))
+        val ore = Robot("ore", mapOf("ore" to split[1].toInt()))
+        val clay = Robot("clay", mapOf("ore" to split[3].toInt()))
+        val obsidian = Robot("obsidian", mapOf("ore" to split[5].toInt(), "clay" to split[6].toInt()))
+        val geode = Robot("geode", mapOf("ore" to split[8].toInt(), "obsidian" to split[9].toInt()))
+        Blueprint(id, mapOf(ore, clay, obsidian, geode))
     }.also { println(it) }
 
     fun part1(): Int {
@@ -32,35 +32,55 @@ class Day19(private val input: List<String>) {
     }
 }
 
-data class Blueprint(val id: Int, val robots: List<Robot>) {
+class Blueprint(val id: Int, val robots: Map<String, Map<String, Int>>) {
 
     val memoize = mutableMapOf<State, Int>()
-
-
     val max = 0
 
     fun maxGeodes() {
 
     }
 
-    tailrec fun step(state: State): Int {
+    fun step(state: State): Int {
         return memoize.computeIfAbsent(state) {
             val (comp1, step) = state
             val (producers, inventory) = comp1
             if (step > 24) return@computeIfAbsent inventory["geode"] ?: 0
-
-
             var produced = produce(producers, inventory)
-            step((producers to inventory) to step +1)
+            step((producers to inventory) to step + 1)
+            buyRobots(state)
+
         }
     }
 
-    private fun produce(producers: Map<Robot, Int>, inventory: Map<String, Int>): Map<String, Int> = producers.map {
-        it.key.type to inventory.getOrDefault(it.key.type, 0) + it.value
+    private fun buyRobots(state: State): Int {
+        val producers = state.getMutableProducers()
+        val inventory = state.getMutableConsumers()
+        return when {
+            inventory.getOrDefault("ore", 0) >= robots["ore"]!!.getOrDefault("ore", 0) -> {
+                inventory["ore"] = inventory["ore"]!! - robots["ore"]!!.getOrDefault("ore", 0)
+                return 0
+
+
+            }
+
+            else -> {0}
+        }
+
+    }
+
+    private fun produce(producers: Map<String, Int>, inventory: Map<String, Int>): Map<String, Int> = producers.map {
+        it.key to inventory.getOrDefault(it.key, 0) + it.value
     }.toMap()
+
+
 }
 
-data class Robot(val type: String, val costs: List<Cost>)
-typealias Cost = Pair<String, Int>
-typealias State = Pair<Pair<MutableMap<Robot, Int>, MutableMap<String, Int>>, Int>
+fun State.getMutableProducers() = first.first.toMutableMap()
+fun State.getMutableConsumers() = first.second.toMutableMap()
+
+fun State.getStep() = second
+
+typealias Robot = Pair<String, Map<String, Int>>
+typealias State = Pair<Pair<Map<String, Int>, Map<String, Int>>, Int>
 
