@@ -1,5 +1,7 @@
 package twentytwentytwo
 
+import java.lang.Integer.max
+
 fun main() {
     val input = {}.javaClass.getResource("input-19.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val test = {}.javaClass.getResource("input-19-1.txt")!!.readText().linesFiltered { it.isNotEmpty() };
@@ -24,6 +26,7 @@ class Day19(private val input: List<String>) {
     }.also { println(it) }
 
     fun part1(): Int {
+        return blueprints.maxOf { it.maxGeodes() }
         error("not found")
     }
 
@@ -34,50 +37,57 @@ class Day19(private val input: List<String>) {
 
 class Blueprint(val id: Int, val robots: Map<String, Map<String, Int>>) {
 
-    val memoize = mutableMapOf<State, Int>()
-    val max = 0
+    val cache = mutableSetOf<State>()
 
-    fun maxGeodes() {
-
+    fun maxGeodes(): Int {
+        return step((mapOf("ore" to 1) to (emptyMap<String, Int>())) to 0)
     }
 
     fun step(state: State): Int {
-        return memoize.computeIfAbsent(state) {
-            val (comp1, step) = state
-            val (producers, inventory) = comp1
-            if (step > 24) return@computeIfAbsent inventory["geode"] ?: 0
-            var produced = produce(producers, inventory)
-            step((producers to inventory) to step + 1)
-            buyRobots(state)
-
+        if (state.getStep() > 24) return state.inventory()["geode"] ?: 0 // done
+        if (state !in cache) {
+            cache.add(state)
+            val produced = produce(state.producers(), state.inventory())
+            return max(
+                step((state.producers() to produced) to state.getStep() + 1),
+                buyRobots((state.producers() to produced) to state.getStep())
+            )
+        } else {
+            return state.inventory()["geode"] ?: 0
         }
     }
 
     private fun buyRobots(state: State): Int {
-        val producers = state.getMutableProducers()
-        val inventory = state.getMutableConsumers()
-        return when {
-            inventory.getOrDefault("ore", 0) >= robots["ore"]!!.getOrDefault("ore", 0) -> {
-                inventory["ore"] = inventory["ore"]!! - robots["ore"]!!.getOrDefault("ore", 0)
-                return 0
-
-
+        var geodes = state.inventory()["geode"] ?: 0
+        robots.keys.forEach {
+           if( canBuyRobot(it, state.inventory()) ) {
+                geodes = max(geodes, step(buyRobot(it, state)))
             }
-
-            else -> {0}
         }
-
+        return geodes
     }
+
+    private fun buyRobot(robot: String, state: State): State {
+        val costs = robots[robot]!!.map {
+            it.key to state.inventory()[it.key]!! - it.value
+        }
+        val robots = (state.producers()[robot] ?: 0) + 1
+        return ((state.producers() + (robot to robots) to state.inventory() + costs) to state.getStep() +1)
+    }
+
+    private fun canBuyRobot(robot: String, inventory: Map<String, Int>): Boolean =
+        robots[robot]!!.all {
+            inventory[it.key] ?: 0 >= it.value
+        }
 
     private fun produce(producers: Map<String, Int>, inventory: Map<String, Int>): Map<String, Int> = producers.map {
         it.key to inventory.getOrDefault(it.key, 0) + it.value
     }.toMap()
 
-
 }
 
-fun State.getMutableProducers() = first.first.toMutableMap()
-fun State.getMutableConsumers() = first.second.toMutableMap()
+fun State.producers() = first.first
+fun State.inventory() = first.second
 
 fun State.getStep() = second
 
