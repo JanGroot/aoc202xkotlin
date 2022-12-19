@@ -68,25 +68,25 @@ class Blueprint(
     val cache = mutableSetOf<State>()
 
     fun maxGeodes(): Int {
-        return step((mapOf("ore" to 1) to (emptyMap<String, Int>())) to 1)
+        return step(State(mapOf("ore" to 1), emptyMap(), 1))
     }
 
     fun step(state: State): Int {
-        if (state.getStep() == 24) return 0
+        if (state.step == 24) return 0
         return if (state !in cache) {
             cache.add(state)
-            val produced = produce(state.producers(), state.inventory())
-            val max = step((state.producers() to produced) to state.getStep() + 1)
-            max(max, buyRobots((state.producers() to produced) to state.getStep()))
+            val produced = produce(state.producers, state.inventory)
+            val max = step(State(state.producers, produced, state.step + 1))
+            max(max, buyRobots(State(state.producers, produced, state.step)))
         } else {
-            state.inventory()["geode"] ?: 0
+            state.inventory["geode"] ?: 0
         }
     }
 
     private fun buyRobots(state: State): Int {
         var max = 0
         robots.keys.forEach {
-            if (canBuyRobot(it, state.inventory()) && shouldBuyRobot(it, state.producers()[it] ?: 0)) {
+            if (canBuyRobot(it, state.inventory) && shouldBuyRobot(it, state.producers[it] ?: 0)) {
                 max = max(max, step(buyRobot(it, state)))
             }
         }
@@ -95,10 +95,10 @@ class Blueprint(
 
     private fun buyRobot(robot: String, state: State): State {
         val costs = robots[robot]!!.map {
-            it.key to state.inventory()[it.key]!! - it.value
+            it.key to state.inventory[it.key]!! - it.value
         }
-        val robots = (state.producers()[robot] ?: 0) + 1
-        return ((state.producers() + (robot to robots) to state.inventory() + costs) to state.getStep() + 1)
+        val robots = (state.producers[robot] ?: 0) + 1
+        return State(state.producers + (robot to robots), state.inventory + costs, state.step + 1)
     }
 
     private fun canBuyRobot(robot: String, inventory: Map<String, Int>): Boolean = robots[robot]!!.all {
@@ -124,12 +124,7 @@ class Blueprint(
 
 }
 
-
-fun State.producers() = first.first
-fun State.inventory() = first.second
-
-fun State.getStep() = second
-
 typealias Robot = Pair<String, Map<String, Int>>
-typealias State = Pair<Pair<Map<String, Int>, Map<String, Int>>, Int>
+
+data class State(val producers: Map<String, Int>, val inventory: Map<String, Int>, val step: Int)
 
