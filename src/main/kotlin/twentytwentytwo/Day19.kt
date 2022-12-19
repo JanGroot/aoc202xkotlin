@@ -40,15 +40,15 @@ data class Blueprint(val id: Int,val robots: List<Robot>) {
     tailrec fun step(state: Pair<MutableMap<Robot, Int>,MutableMap<String, Int>>, step: Int): Int {
         val (producers, inventory) = state
         if (step > 24) return inventory["geode"] ?: 0
-        produce(producers, inventory)
+
+
+        var produced = produce(producers, inventory)
         step(state, step + 1)
     }
 
-    private fun produce(producers: Map<Robot, Int>, inventory: MutableMap<String, Int>) {
-        producers.forEach { (r, i) ->
-            inventory[r.type] = inventory.getOrDefault(r.type, 0) + i
-        }
-    }
+    private fun produce(producers: Map<Robot, Int>, inventory: Map<String, Int>): Map<String, Int> = producers.map {
+        it.key.type to inventory.getOrDefault(it.key.type, 0) + it.value
+    }.toMap()
 }
 data class Robot(val type: String, val costs: List<Cost>)
 typealias Cost = Pair<String,Int>
