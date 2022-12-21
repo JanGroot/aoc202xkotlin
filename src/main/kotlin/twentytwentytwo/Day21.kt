@@ -1,12 +1,17 @@
 package twentytwentytwo
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import java.math.BigInteger
+
 fun main() {
     val input = {}.javaClass.getResource("input-21.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val tinput = {}.javaClass.getResource("input-21-1.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val test = Day21(tinput)
     val day = Day21(input)
     println(test.part1())
-    println(test.part2())
+    //println(test.part2())
     println(day.part1())
     println(day.part2())
 }
@@ -50,9 +55,9 @@ class Day21(private val input: List<String>) {
         var (x, y) = root.split(" + ")
 
 
-        fun recurse(value: String): Long {
+        fun recurse(value: String): BigInteger {
             return when {
-                value.all { it.isDigit() } -> value.toLong()
+                value.all { it.isDigit() } -> value.toBigInteger()
                 value.contains("*") -> {
                     val (a,b) = value.split(" * ")
                     return recurse(monkeys[a]!!) * recurse(monkeys[b]!!)
@@ -72,8 +77,31 @@ class Day21(private val input: List<String>) {
                 else -> {
                     error("$value")
                 }
-            }.also {
+            }
+        }
 
+        fun recurseString(value: String): String {
+           return when {
+                value.all { it.isDigit() } -> value
+                value.contains("*") -> {
+                    val (a,b) = value.split(" * ")
+                    "(${recurseString(monkeys[a]!!)} * ${recurseString(monkeys[b]!!)})"
+                }
+                value.contains("-") -> {
+                    val (a,b) = value.split(" - ")
+                    "(${recurseString(monkeys[a]!!)} - ${recurseString(monkeys[b]!!)})"
+                }
+                value.contains("+") -> {
+                    val (a,b) = value.split(" + ")
+                    "(${recurseString(monkeys[a]!!)} + ${recurseString(monkeys[b]!!)})"
+                }
+                value.contains("/") -> {
+                    val (a,b) = value.split(" / ")
+                    "(${recurseString(monkeys[a]!!)} / ${recurseString(monkeys[b]!!)})"
+                }
+                else -> {
+                    value
+                }
             }
         }
         // what is happening?
@@ -83,11 +111,18 @@ class Day21(private val input: List<String>) {
         monkeys["humn"] = "2"
         println(recurse(monkeys[x]!!) to recurse(monkeys[y]!!))
 
-        monkeys["humn"] = "200"
+        monkeys["humn"] = "123499000006"
         println(recurse(monkeys[x]!!) to recurse(monkeys[y]!!))
 
         val target = recurse(monkeys[y]!!)
-        val first = generateSequence(1) {
+        println(x)
+        monkeys["humn"] = "X"
+        println(recurseString(monkeys[x]!!))
+
+        monkeys["humn"] = "3293777973422953"
+        println(recurse(monkeys[x]!!))
+
+        val first = generateSequence(3000) {
             it + 1
         }.map {
             monkeys["humn"] = "$it"
@@ -102,5 +137,4 @@ class Day21(private val input: List<String>) {
         return monkeys["humn"]!!
     }
 }
-
 
