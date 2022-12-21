@@ -1,16 +1,18 @@
 package twentytwentytwo
 
-import twentytwentytwo.Structures.ArrayListQueue
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 
-fun main() {
+suspend fun main() {
     val input = {}.javaClass.getResource("input-19.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val test = {}.javaClass.getResource("input-19-1.txt")!!.readText().linesFiltered { it.isNotEmpty() };
     val day = Day19(input)
     val testDay = Day19(test)
     //println(testDay.part1())
     //println(testDay.part2())
-    println(day.part1())
+    //println(day.part1())
     println(day.part2())
 }
 
@@ -34,13 +36,17 @@ class Day19(private val input: List<String>) {
         )
     }
 
-    fun part1(): Int {
-        return blueprints.sumOf { it.id * it.maxGeodes(State(oreRobot = 1, step = 24)) }
+    suspend fun part1(): Int {
+        return blueprints.pmap { it.id * it.maxGeodes(State(oreRobot = 1, step = 24)) }.sum()
     }
 
-    fun part2(): Int {
-        return blueprints.take(3).map { it.maxGeodes(State(oreRobot = 1, step = 32)).also { println(it) } }
+    suspend fun part2(): Int {
+        return blueprints.take(3).pmap{it.maxGeodes(State(oreRobot = 1, step = 32)).also { println(it) } }
             .reduce(Int::times)
+    }
+
+    suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+        map { async { f(it) } }.awaitAll()
     }
 }
 
@@ -60,39 +66,34 @@ class Blueprint(
     fun maxGeodes(state: State): Int {
         var max = 0
         var cache = mutableSetOf<State>()
-        var queue = ArrayListQueue<State>()
+        var queue = Structures.ArrayListQueue<State>()
         queue.enqueue(state)
         while (!queue.isEmpty) {
-            var current = queue.dequeue()!!
-            if (!cache.contains(current)) {
-                cache.add(current)
-                if (current.step == 0) {
-                    max = maxOf(max, current.geode)
-                } else {
-                    val next = current.produce()
-                    if (current.canBuy("geode")) {
-                        queue.enqueue(next.buy("geode"))
-                    } else
-                        if (current.canBuy("obsidian") && current.shouldBuy("obsidian")) {
-                            queue.enqueue(next.buy("obsidian"))
-                        } else {
-                            if (current.canBuy("ore") && current.shouldBuy("ore")) {
-                                queue.enqueue(next.buy("ore"))
-                            }
-                            if (current.canBuy("clay") && current.shouldBuy("clay")) {
-                                queue.enqueue(next.buy("clay"))
-                            }
-
-
+                var current = queue.dequeue()!!
+                if (!cache.contains(current)) {
+                    cache.add(current)
+                    if (current.step == 0) {
+                        max = maxOf(max, current.geode)
+                    } else {
+                        val next = current.produce()
+                        if (current.canBuy("geode")) {
+                            queue.enqueue(next.buy("geode"))
+                            queue.enqueue(next)
+                        } else
+                            if (current.canBuy("obsidian")) {
+                                queue.enqueue(next.buy("obsidian"))
+                            } else {
+                                if (current.canBuy("ore")) {
+                                    queue.enqueue(next.buy("ore"))
+                                }
+                                if (current.canBuy("clay")) {
+                                    queue.enqueue(next.buy("clay"))
+                                }
                                 queue.enqueue(next)
-
-
-
-
-                        }
+                            }
+                    }
                 }
             }
-        }
         return max
     }
 
@@ -110,25 +111,13 @@ class Blueprint(
         )
     }
 
-    private fun State.shouldBuy(robot: String): Boolean {
-        return when (robot) {
-            "geode" -> true
-            "ore" -> oreRobot < oreLimit
-            "obsidian" -> obsidianRobot < obsidianLimit
-            "clay" -> clayRobot < clayLimit
-            else -> {
-                error("oops")
-            }
-        }
-    }
-
 
     private fun State.canBuy(robot: String): Boolean {
         return when (robot) {
             "geode" -> ore >= geodeCostOre && obsidian >= geodeCostObsidian
-            "obsidian" -> ore >= obsidianCostOre && clay >= obsidianCostClay
-            "clay" -> ore >= clayCostOre
-            "ore" -> ore >= oreCost
+            "obsidian" -> ore >= obsidianCostOre && clay >= obsidianCostClay && obsidianRobot < obsidianLimit
+            "clay" -> ore >= clayCostOre && clayRobot < clayLimit
+            "ore" -> ore >= oreCost && oreRobot < oreLimit
             else -> {
                 error("oops")
             }
@@ -162,27 +151,11 @@ class Blueprint(
             )
 
             "clay" -> State(
-                ore - clayCostOre,
-                clay,
-                obsidian,
-                geode,
-                oreRobot,
-                clayRobot + 1,
-                obsidianRobot,
-                geodeRobot,
-                step
+                ore - clayCostOre, clay, obsidian, geode, oreRobot, clayRobot + 1, obsidianRobot, geodeRobot, step
             )
 
             "ore" -> State(
-                ore - oreCost,
-                clay,
-                obsidian,
-                geode,
-                oreRobot + 1,
-                clayRobot,
-                obsidianRobot,
-                geodeRobot,
-                step
+                ore - oreCost, clay, obsidian, geode, oreRobot + 1, clayRobot, obsidianRobot, geodeRobot, step
             )
 
             else -> {
