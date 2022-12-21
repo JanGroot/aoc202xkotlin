@@ -34,8 +34,8 @@ class Day21(input: List<String>) {
         monkeys[HUMAN] = Value(HUMAN, 1)
         val runLeft = recurse(monkeys[root.left]!!)
         monkeys[HUMAN] = Value(HUMAN, 1000)
-        val leftConstant = (runLeft == recurse(monkeys[root.left]!!)).also { println(it) }
-        val leftGrowing = (runLeft < recurse(monkeys[root.left]!!)).also { println(it) }
+        val leftConstant = (runLeft == recurse(monkeys[root.left]!!))
+        val leftGrowing = (runLeft < recurse(monkeys[root.left]!!))
         val growing = leftConstant xor leftGrowing
         val target = if (leftConstant) recurse(monkeys[root.left]!!) else recurse(monkeys[root.right]!!)
         val variable = if (leftConstant) monkeys[root.right]!! else monkeys[root.left]!!
@@ -44,20 +44,18 @@ class Day21(input: List<String>) {
             val guess = (under + over) / 2
             monkeys[HUMAN] = Value(HUMAN, guess)
             val result = recurse(variable)
-            when {
-               growing -> {
-                    when {
-                        (result < target) -> under = guess + 1
-                        (result > target) -> over = guess - 1
-                        else -> return guess
-                    }
+            if (growing) {
+                when {
+                    (result < target) -> under = guess + 1
+                    (result > target) -> over = guess - 1
+                    else -> return guess
                 }
-                else -> {
-                    when {
-                        (result > target) -> under = guess + 1
-                        (result < target) -> over = guess - 1
-                        else -> return guess
-                    }
+            }
+            else {
+                when {
+                    (result > target) -> under = guess + 1
+                    (result < target) -> over = guess - 1
+                    else -> return guess
                 }
             }
         }
