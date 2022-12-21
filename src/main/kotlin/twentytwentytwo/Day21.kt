@@ -1,9 +1,5 @@
 package twentytwentytwo
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import java.math.BigInteger
 
 fun main() {
     val input = {}.javaClass.getResource("input-21.txt")!!.readText().linesFiltered { it.isNotEmpty() };
@@ -54,10 +50,9 @@ class Day21(private val input: List<String>) {
         var root = monkeys["root"]!!
         var (x, y) = root.split(" + ")
 
-
-        fun recurse(value: String): BigInteger {
+        fun recurse(value: String): Long {
             return when {
-                value.all { it.isDigit() } -> value.toBigInteger()
+                value.all { it.isDigit() } -> value.toLong()
                 value.contains("*") -> {
                     val (a,b) = value.split(" * ")
                     return recurse(monkeys[a]!!) * recurse(monkeys[b]!!)
@@ -79,62 +74,20 @@ class Day21(private val input: List<String>) {
                 }
             }
         }
-
-        fun recurseString(value: String): String {
-           return when {
-                value.all { it.isDigit() } -> value
-                value.contains("*") -> {
-                    val (a,b) = value.split(" * ")
-                    "(${recurseString(monkeys[a]!!)} * ${recurseString(monkeys[b]!!)})"
-                }
-                value.contains("-") -> {
-                    val (a,b) = value.split(" - ")
-                    "(${recurseString(monkeys[a]!!)} - ${recurseString(monkeys[b]!!)})"
-                }
-                value.contains("+") -> {
-                    val (a,b) = value.split(" + ")
-                    "(${recurseString(monkeys[a]!!)} + ${recurseString(monkeys[b]!!)})"
-                }
-                value.contains("/") -> {
-                    val (a,b) = value.split(" / ")
-                    "(${recurseString(monkeys[a]!!)} / ${recurseString(monkeys[b]!!)})"
-                }
-                else -> {
-                    value
-                }
+        // approx
+        var under = 0L
+        var over = 5000000000000L
+        val target = recurse(monkeys[y]!!)
+        while (true) {
+            val guess = (under + over) / 2
+            monkeys["humn"] = "$guess"
+            val result = recurse(monkeys[x]!!)
+            when {
+                (result > target) -> under = guess + 1
+                (result < target) -> over = guess - 1
+                else -> return monkeys["humn"]!!
             }
         }
-        // what is happening?
-        monkeys["humn"] = "1"
-        println(recurse(monkeys[x]!!) to recurse(monkeys[y]!!))
-
-        monkeys["humn"] = "2"
-        println(recurse(monkeys[x]!!) to recurse(monkeys[y]!!))
-
-        monkeys["humn"] = "123499000006"
-        println(recurse(monkeys[x]!!) to recurse(monkeys[y]!!))
-
-        val target = recurse(monkeys[y]!!)
-        println(x)
-        monkeys["humn"] = "X"
-        println(recurseString(monkeys[x]!!))
-
-        monkeys["humn"] = "3293777973422953"
-        println(recurse(monkeys[x]!!))
-
-        val first = generateSequence(3000) {
-            it + 1
-        }.map {
-            monkeys["humn"] = "$it"
-            recurse(monkeys[x]!!)
-        }
-            .filter { it == target }.first()
-
-        println(first)
-
-
-
-        return monkeys["humn"]!!
     }
 }
 
