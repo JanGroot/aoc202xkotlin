@@ -1,5 +1,7 @@
 package twentytwentytwo
 
+import kotlin.math.sqrt
+
 
 fun main() {
     val input = {}.javaClass.getResource("input-22.txt")!!.readText().split("\n\n");
@@ -7,19 +9,20 @@ fun main() {
     val test = Day22(tinput)
     val day = Day22(input)
     val testResult1 = test.part1()
-    println((testResult1.first.first * 4) + (testResult1.first.second * 1000) + Day22.directions.indexOf(testResult1.second))
-    val result1 = day.part1()
-    println((result1.first.first * 4) + (result1.first.second * 1000) + Day22.directions.indexOf(result1.second))
-    //println(test.part2())
+    //println((testResult1.first.first * 4) + (testResult1.first.second * 1000) + Day22.directions.indexOf(testResult1.second))
+    //val result1 = day.part1()
+    //println((result1.first.first * 4) + (result1.first.second * 1000) + Day22.directions.indexOf(result1.second))
+    println(test.part2())
     //println(day.part1())
-    //println(day.part2())
+     println(day.part2())
 }
 
 
 class Day22(val input: List<String>) {
     val land: List<Pair<Pair<Int, Int>, Char>> = input[0].lines().mapIndexed { y, row ->
         row.mapIndexed { x, s -> x + 1 to y + 1 to s }
-    }.flatten().filter { p -> p.second != ' ' }
+    }.flatten().filter { p -> p.second != ' ' }.sortedWith(compareBy({it.first.first}, {it.first.second}))
+
     val path = "([R|L])|(\\d+)".toRegex().findAll(input[1]).map { it.value }.toList()
 
     var direction = "R"
@@ -44,8 +47,26 @@ class Day22(val input: List<String>) {
     }
 
     fun part2() {
-        TODO()
+        val size = (land.size / 6).toDouble()
+        val sides = (sqrt(size)).toInt()
+        println(sqrt(size))
+        val ranges = input[0].lines().windowed(1,sides, true).flatten().map {
+            it.windowed(sides, sides).also { println(it) }
+        }
+
+        (1..size.toInt()).map { x ->
+            val points = land.filter { it.first.first == x }.also { println(it.size) }.also { println(it.size) }
+            points.map {
+                it to points.size / sides + (x -1 /sides)
+                // let's try to slice it in a cube
+
+            }
+        }.flatten().also { println(it.size) }.forEach {
+            println(it)
+        }
+
     }
+
     fun move(position: Pair<Int, Int>, steps: Int): Pair<Int, Int> {
         if (steps == 0) return position
         var next = move(position)
@@ -95,6 +116,10 @@ class Day22(val input: List<String>) {
         val directions = arrayOf("R", "D", "L", "U")
 
 
+    }
+
+    fun Pair<Int,Int>.getSide(): Int {
+return 0
     }
 
 }
