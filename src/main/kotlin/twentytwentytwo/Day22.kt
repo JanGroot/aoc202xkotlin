@@ -8,20 +8,20 @@ fun main() {
     val tinput = {}.javaClass.getResource("input-22-1.txt")!!.readText().split("\n\n");
     val test = Day22(tinput)
     val day = Day22(input)
-    val testResult1 = test.part1()
+    //val testResult1 = test.part1()
     //println((testResult1.first.first * 4) + (testResult1.first.second * 1000) + Day22.directions.indexOf(testResult1.second))
     //val result1 = day.part1()
     //println((result1.first.first * 4) + (result1.first.second * 1000) + Day22.directions.indexOf(result1.second))
-    println(test.part2())
-    //println(day.part1())
-    println(day.part2())
+    var result2 = day.part2()
+    println(result2)
+    println((result2.first.first * 4) + (result2.first.second * 1000) + Day22.directions.indexOf(result2.second))
 }
 
 
 class Day22(val input: List<String>) {
     val land: List<Pair<Pair<Int, Int>, Char>> = input[0].lines().mapIndexed { y, row ->
         row.mapIndexed { x, s -> x + 1 to y + 1 to s }
-    }.flatten().filter { p -> p.second != ' ' }.sortedWith(compareBy({ it.first.first }, { it.first.second }))
+    }.flatten().filter { p -> p.second != ' ' }
 
     val path = "([R|L])|(\\d+)".toRegex().findAll(input[1]).map { it.value }.toList()
 
@@ -51,19 +51,19 @@ class Day22(val input: List<String>) {
         }.flatten()*/
 
 
-        val side0 = 0 to (51..100 to 1..50)
-        val side1 = 1 to (101..150 to 1..50)
-        val side2 = 2 to (51..100 to 51..100)
-        val side3 = 3 to (1..50 to 101..150)
-        val side4 = 4 to (51..100 to 101..150)
-        val side5 = 5 to (1..50 to 151..200)
-        edges = listOf(side0, side1, side2, side3, side4, side5)
+        val side1 = 1 to (51..100 to 1..50)
+        val side2 = 2 to (101..150 to 1..50)
+        val side3 = 3 to (51..100 to 51..100)
+        val side4 = 4 to (1..50 to 101..150)
+        val side5 = 5 to (51..100 to 101..150)
+        val side6 = 6 to (1..50 to 151..200)
+        edges = listOf(side6, side1, side2, side3, side4, side5)
     }
 
     fun part1(): Pair<Pair<Int, Int>, String> {
         position = land.first().first
         path.forEach { step ->
-            //println("${position} next ${step}")
+            print("${position} next ${step}")
             when (step) {
                 "R" -> direction = rotate("R")
                 "L" -> direction = rotate("L")
@@ -82,9 +82,10 @@ class Day22(val input: List<String>) {
     }
 
     fun part2(): Pair<Pair<Int, Int>, String> {
-        position = land.first().first
+        position = 51 to 1
+        direction = "R"
         path.forEach { step ->
-            //println("${position} next ${step}")
+            print("${position} next ${step}")
             when (step) {
                 "R" -> direction = rotate("R")
                 "L" -> direction = rotate("L")
@@ -132,7 +133,8 @@ class Day22(val input: List<String>) {
 
     fun move2(position: Pair<Int, Int>, steps: Int): Pair<Int, Int> {
         if (steps == 0) return position
-        var next = move(position)
+        println("$position + $direction")
+        var next = move2(position)
         val side = position.getSide()
         var found = land.firstOrNull { p -> p.first == next }
             ?: when (direction) {
@@ -146,63 +148,66 @@ class Day22(val input: List<String>) {
             }
         val nextSide = next.getSide()
         if (side != nextSide) {
-            println("search again")
+            /* val side1 = 1 to (51..100 to 1..50)
+        val side2 = 2 to (101..150 to 1..50)
+        val side3 = 3 to (51..100 to 51..100)
+        val side4 = 4 to (1..50 to 101..150)
+        val side5 = 5 to (51..100 to 101..150)
+        val side6 = 6 to (1..50 to 151..200)*/
             var nextSet: Pair<String, Pair<Int, Int>> = when (side to direction) {
-                0 to "U" -> {
-                    "R" to (1 to position.first)
+                1 to "U" -> { // to 6
+                    "R" to (1 to position.first + 100) //ok
+                }
+                1 to "L" -> {  //to 4
+                    "R" to (1 to 151 - position.second) //ok
+                }
+                2 to "U" -> { // to 6
+                    "U" to (position.first - 100 to 200) //ok
                 }
 
-                0 to "L" -> {
-                    "R" to (1 to 50 - position.second)
+                2 to "R" -> {// to 5
+                    "L" to (100 to 151 - position.second)
                 }
 
-                1 to "U" -> {
-                    "U" to (position.first - 100 to 200)
-                }
-
-                1 to "R" -> {
-                    "L" to (100 to 150 - position.second)
-                }
-
-                1 to "D" -> {
+                2 to "D" -> { // to 3
                     "L" to (100 to position.first - 50)
                 }
 
-                2 to "R" -> {
+                3 to "R" -> {
                     "U" to (position.second + 50 to 50)
                 }
 
-                2 to "L" -> {
-                    "D" to (position.second - 50 to 101)
-                }
-
                 3 to "L" -> {
-                    "R" to (51 to 150 - position.second)
+                    "D" to (position.second - 50 to 101)//ok
                 }
 
-                3 to "U" -> {
+                4 to "L" -> {
+                    "R" to (51 to 151 - position.second)
+                }
+
+                4 to "U" -> {
                     "R" to (51 to position.first + 50)
                 }
 
-                4 to "R" -> {
-                    "L" to (150 to 150 - position.second)
+                5 to "R" -> {
+                    "L" to (150 to 151 - position.second)
 
-                }
-
-                4 to "D" -> {
-                    "L" to (50 to position.first + 100)
                 }
 
                 5 to "D" -> {
+                    "L" to (50 to position.first + 100)
+                }
+
+                6 to "D" -> {
                     "D" to (position.first + 100 to 1)
                 }
 
-                5 to "R" -> {
+                6 to "R" -> {
                     "U" to (position.second - 100 to 150)
 
                 }
 
-                5 to "L" -> {
+                6 to "L" -> {
                     "D" to (position.second - 100 to 1)
                 }
 
@@ -210,16 +215,18 @@ class Day22(val input: List<String>) {
                     direction to next
                 }
             }
-            println("$next + $direction")
+
             found = land.firstOrNull { p -> p.first == nextSet.second }!!
-            if (found.second == '#') return position
+            if (found.second == '#') {
+                return position
+            }
             direction = nextSet.first
         }
 
         //println(found)
 
         if (found.second == '#') return position
-        return move(found.first, steps - 1)
+        return move2(found.first, steps - 1)
     }
 
     fun move2(position: Pair<Int, Int>): Pair<Int, Int> {
@@ -243,15 +250,6 @@ class Day22(val input: List<String>) {
             }
         }
     }
-    /*
-    1 u -> 6 van links -> r
-    1 d -> 3 van boven dus d
-    3 d -> 5 van boven dus d
-    5 d -> 6 van rechts dus l
-    1 r -> 2 van links dus r
-
-    2r -> 5 l dus 3 inverted
-    */
 
     companion object {
         val directions = arrayOf("R", "D", "L", "U")
